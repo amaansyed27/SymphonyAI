@@ -5,8 +5,7 @@ import RoadmapPath from './components/RoadmapPath';
 import SidePanel from './components/SidePanel';
 import APIKeyManager from './components/APIKeyManager';
 import DocumentationModal from './components/DocumentationModal';
-import { Settings, Sparkles, RefreshCw, FileText, CheckCircle } from 'lucide-react';
-import { useGemini } from './hooks/useGemini';
+import { Settings, Sparkles, FileText, CheckCircle } from 'lucide-react';
 
 const ROADMAP_STAGES: RoadmapStage[] = [
   {
@@ -76,10 +75,6 @@ function App() {
   const [apiKeyModalOpen, setApiKeyModalOpen] = useState(false);
   const [documentationModalOpen, setDocumentationModalOpen] = useState(false);
   const [apiKey, setApiKey] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generationProgress, setGenerationProgress] = useState('');
-
-  const { generateStructuredContent, generateLogo } = useGemini();
 
   // Load API key from localStorage on mount
   useEffect(() => {
@@ -89,323 +84,7 @@ function App() {
     }
   }, []);
 
-  const generateAllContent = async (data: Partial<ProjectData>) => {
-    if (!apiKey) {
-      console.warn('No API key available for content generation');
-      return data;
-    }
-
-    setIsGenerating(true);
-    let updatedData = { ...data };
-
-    try {
-      // 1. Generate Name & Logo
-      setGenerationProgress('Generating project name and branding...');
-      const nameLogoPrompt = `
-        Based on the following project details, generate creative suggestions:
-        - Platform: ${data.platform}
-        - Project Type: ${data.projectType}
-        - Target Audience: ${data.targetAudience}
-        - Budget: ${data.budget}
-        - Timeline: ${data.timeline}
-
-        Please provide the response in JSON format with the following structure:
-        {
-          "names": ["name1", "name2", "name3", "name4", "name5"],
-          "slogans": ["slogan1", "slogan2", "slogan3", "slogan4", "slogan5"],
-          "logoIdeas": ["description1", "description2", "description3"]
-        }
-
-        Make the names catchy, memorable, and relevant to the project type.
-        Make the slogans concise and impactful.
-        Describe logo concepts that would work well for this type of project.
-      `;
-
-      const nameLogoResult = await generateStructuredContent(nameLogoPrompt, apiKey);
-      if (nameLogoResult) {
-        updatedData.name = nameLogoResult.names?.[0] || 'My Project';
-        updatedData.slogan = nameLogoResult.slogans?.[0] || 'Building something amazing';
-        
-        // Generate a logo for the selected name
-        if (updatedData.name) {
-          setGenerationProgress('Creating AI-generated logo...');
-          const logoPrompt = `Create a professional, modern logo for "${updatedData.name}" - ${data.projectType}. 
-          The logo should be:
-          - Clean and minimalist design
-          - Suitable for ${data.platform} platform
-          - Appealing to ${data.targetAudience}
-          - Vector-style with clear, bold shapes
-          - Professional color scheme
-          - Scalable and readable at small sizes
-          - No text/typography, just the icon/symbol
-          
-          Style: Modern, professional, ${data.projectType} themed`;
-
-          try {
-            const logoResult = await generateLogo(logoPrompt, apiKey);
-            if (logoResult) {
-              updatedData.logo = logoResult.imageUrl;
-            }
-          } catch (logoError) {
-            console.warn('Logo generation failed, continuing without logo:', logoError);
-          }
-        }
-      }
-
-      // 2. Generate Tech Stack
-      setGenerationProgress('Selecting optimal technology stack...');
-      const stackPrompt = `
-        Based on the following project requirements, recommend the best technology stack:
-        - Platform: ${data.platform}
-        - Project Type: ${data.projectType}
-        - Target Audience: ${data.targetAudience}
-        - Budget: ${data.budget}
-        - Timeline: ${data.timeline}
-        - Experience Level: ${data.experience}
-
-        Provide the best stack option in JSON format:
-        {
-          "stack": {
-            "tier": "Budget-Friendly|Balanced|Premium",
-            "priceRange": "$0-$50/month",
-            "frontend": "Technology name",
-            "backend": "Technology name",
-            "database": "Technology name",
-            "hosting": "Platform name",
-            "pros": ["advantage1", "advantage2", "advantage3"],
-            "cons": ["limitation1", "limitation2"],
-            "suitableFor": "Who this is best for"
-          }
-        }
-
-        Choose the most appropriate tier based on budget and requirements.
-      `;
-
-      const stackResult = await generateStructuredContent(stackPrompt, apiKey);
-      if (stackResult?.stack) {
-        updatedData.techStack = {
-          frontend: stackResult.stack.frontend,
-          backend: stackResult.stack.backend,
-          database: stackResult.stack.database,
-          hosting: stackResult.stack.hosting,
-          priceRange: stackResult.stack.priceRange
-        };
-      }
-
-      // 3. Generate Features
-      setGenerationProgress('Brainstorming essential features...');
-      const featuresPrompt = `
-        Based on the following project details, generate essential must-have features:
-        - Platform: ${data.platform}
-        - Project Type: ${data.projectType}
-        - Target Audience: ${data.targetAudience}
-        - Budget: ${data.budget}
-        - Timeline: ${data.timeline}
-
-        Generate 8-10 must-have features in JSON format:
-        {
-          "features": [
-            {
-              "name": "Feature name",
-              "description": "Brief description of the feature",
-              "priority": "high|medium|low",
-              "category": "Category name (e.g., Core, User Management, Content, etc.)"
-            }
-          ]
-        }
-
-        Focus on core functionality that this type of ${data.projectType} absolutely needs.
-      `;
-
-      const featuresResult = await generateStructuredContent(featuresPrompt, apiKey);
-      if (featuresResult?.features) {
-        const features = featuresResult.features.map((f: any, index: number) => ({
-          ...f,
-          id: `feature-${index}`
-        }));
-        updatedData.features = features;
-        updatedData.decidedFeatures = features.filter((f: any) => f.priority === 'high');
-      }
-
-      // 4. Generate UI Design
-      setGenerationProgress('Creating UI design concepts...');
-      const uiDesignPrompt = `
-        Based on the following project details, generate UI design suggestions:
-        - Platform: ${data.platform}
-        - Project Type: ${data.projectType}
-        - Target Audience: ${data.targetAudience}
-        - Selected Features: ${updatedData.decidedFeatures?.map((f: any) => f.name).join(', ') || 'Core features'}
-
-        Generate design suggestions in JSON format:
-        {
-          "colorPalettes": [
-            {
-              "name": "Palette name",
-              "description": "Brief description",
-              "primary": "#hex",
-              "secondary": "#hex",
-              "accent": "#hex",
-              "background": "#hex",
-              "text": "#hex",
-              "mood": "Professional/Playful/Modern/etc"
-            }
-          ],
-          "designStyles": [
-            {
-              "name": "Style name",
-              "description": "Description of the style",
-              "characteristics": ["trait1", "trait2", "trait3"],
-              "suitableFor": "Who this works best for"
-            }
-          ]
-        }
-
-        Provide 3 color palettes and 3 design styles. Consider the target audience and project type.
-      `;
-
-      const uiDesignResult = await generateStructuredContent(uiDesignPrompt, apiKey);
-      if (uiDesignResult) {
-        const selectedPalette = uiDesignResult.colorPalettes?.[0];
-        const selectedStyle = uiDesignResult.designStyles?.[0];
-        
-        if (selectedPalette && selectedStyle) {
-          updatedData.uiStyle = {
-            colorPalette: [selectedPalette.primary, selectedPalette.secondary, selectedPalette.accent, selectedPalette.background, selectedPalette.text],
-            designStyle: selectedStyle.name,
-            selectedPalette,
-            selectedStyle,
-            inspiration: []
-          };
-        }
-      }
-
-      // 5. Generate UI Flow
-      setGenerationProgress('Mapping user interface flow...');
-      const uiFlowPrompt = `
-        Based on the following project details, generate a user flow:
-        - Platform: ${data.platform}
-        - Project Type: ${data.projectType}
-        - Features: ${updatedData.decidedFeatures?.map((f: any) => f.name).join(', ') || 'Core features'}
-
-        Generate a logical user flow in JSON format:
-        {
-          "flow": [
-            {
-              "id": "unique_id",
-              "name": "Screen/Action name",
-              "type": "screen|action|decision",
-              "description": "Brief description",
-              "connections": ["id1", "id2"],
-              "position": {"x": 100, "y": 100}
-            }
-          ]
-        }
-
-        Create 8-12 nodes that represent the main user journey through the app.
-        Include different types: screens (main app pages), actions (user interactions), decisions (choice points).
-        Position them in a logical flow from left to right, top to bottom.
-      `;
-
-      const uiFlowResult = await generateStructuredContent(uiFlowPrompt, apiKey);
-      if (uiFlowResult?.flow) {
-        updatedData.uiFlow = uiFlowResult.flow;
-      }
-
-      // 6. Generate Builder Tools
-      setGenerationProgress('Recommending development tools...');
-      const builderToolsPrompt = `
-        Based on the following project details, recommend development tools:
-        - Platform: ${data.platform}
-        - Project Type: ${data.projectType}
-        - Tech Stack: ${updatedData.techStack ? 
-          `${updatedData.techStack.frontend}, ${updatedData.techStack.backend}, ${updatedData.techStack.database}` : 
-          'Not selected'}
-        - Experience Level: ${data.experience}
-        - Budget: ${data.budget}
-
-        Recommend tools in JSON format:
-        {
-          "frontendTools": [
-            {
-              "name": "Tool name",
-              "type": "frontend",
-              "description": "What this tool does",
-              "pricing": "Free/Paid/Freemium",
-              "learningCurve": "Easy/Medium/Hard",
-              "features": ["feature1", "feature2"],
-              "bestFor": "Who should use this",
-              "url": "https://example.com"
-            }
-          ],
-          "backendTools": [similar structure],
-          "databaseTools": [similar structure],
-          "noCodeTools": [similar structure]
-        }
-
-        Include tools like: Bolt.new, v0 by Vercel, Lovable.dev, Cursor, GitHub Copilot, Claude, Firebase, Supabase, etc.
-        Consider the user's experience level and budget. Provide 2-3 tools per category.
-      `;
-
-      const builderToolsResult = await generateStructuredContent(builderToolsPrompt, apiKey);
-      if (builderToolsResult) {
-        updatedData.builderTools = builderToolsResult;
-      }
-
-      // 7. Generate Deployment Recommendations
-      setGenerationProgress('Planning deployment strategy...');
-      const deploymentPrompt = `
-        Based on the following project details, recommend deployment platforms:
-        - Platform: ${data.platform}
-        - Project Type: ${data.projectType}
-        - Tech Stack: ${updatedData.techStack ? 
-          `Frontend: ${updatedData.techStack.frontend}, Backend: ${updatedData.techStack.backend}, Database: ${updatedData.techStack.database}` : 
-          'Not selected'}
-        - Budget: ${data.budget}
-        - Timeline: ${data.timeline}
-        - Experience Level: ${data.experience}
-
-        Recommend the best deployment platform in JSON format:
-        {
-          "recommendation": {
-            "name": "Platform name",
-            "type": "Frontend/Backend/Full-stack/Database",
-            "pricing": "Free tier info + paid plans",
-            "pros": ["advantage1", "advantage2", "advantage3"],
-            "cons": ["limitation1", "limitation2"],
-            "bestFor": "Who should use this",
-            "setup": ["step1", "step2", "step3"],
-            "url": "https://platform.com",
-            "score": 85
-          }
-        }
-
-        Consider platforms like Vercel, Netlify, Railway, Render, DigitalOcean, AWS, Heroku, Firebase Hosting, etc.
-        Choose the most suitable one based on the project requirements.
-      `;
-
-      const deploymentResult = await generateStructuredContent(deploymentPrompt, apiKey);
-      if (deploymentResult?.recommendation) {
-        updatedData.deployment = {
-          platform: deploymentResult.recommendation.name,
-          reasoning: `Selected ${deploymentResult.recommendation.name} because: ${deploymentResult.recommendation.bestFor}`,
-          steps: deploymentResult.recommendation.setup
-        };
-      }
-
-      setGenerationProgress('Complete! Your project plan is ready.');
-      
-    } catch (error) {
-      console.error('Error generating content:', error);
-      setGenerationProgress('Generation completed with some errors. You can manually generate missing sections.');
-    } finally {
-      setIsGenerating(false);
-      setTimeout(() => setGenerationProgress(''), 3000);
-    }
-
-    return updatedData;
-  };
-
-  const handleQuestionnaireComplete = async (data: Partial<ProjectData>) => {
+  const handleQuestionnaireComplete = (data: Partial<ProjectData>) => {
     const newProjectData = {
       ...data,
       id: 'project-' + Date.now(),
@@ -416,12 +95,8 @@ function App() {
     setProjectData(newProjectData);
     setCurrentStep('roadmap');
     
-    // Generate all content automatically
-    const completeProjectData = await generateAllContent(newProjectData);
-    setProjectData(completeProjectData);
-    
-    // Update stage availability and completion
-    updateStageAvailability(completeProjectData);
+    // Update stage availability (but don't mark anything as completed)
+    updateStageAvailability(newProjectData);
   };
 
   const updateStageAvailability = (data: Partial<ProjectData>) => {
@@ -429,7 +104,8 @@ function App() {
       // Check if this stage is completed
       const isCompleted = checkStageCompletion(stage.id, data);
       
-      if (isCompleted) {
+      if (isCompleted && stage.status === 'completed') {
+        // Keep it completed if it was already marked as completed
         return { ...stage, status: 'completed' as const };
       }
       
@@ -440,7 +116,7 @@ function App() {
       
       // Check if previous stages are completed
       const previousStagesCompleted = roadmapStages.slice(0, index).every(prevStage => {
-        return checkStageCompletion(prevStage.id, data);
+        return prevStage.status === 'completed';
       });
       
       if (previousStagesCompleted) {
@@ -496,7 +172,7 @@ function App() {
     const updatedData = { ...projectData, ...updates };
     setProjectData(updatedData);
     
-    // Update stage availability and completion status
+    // Update stage availability but don't auto-complete stages
     updateStageAvailability(updatedData);
   };
 
@@ -567,17 +243,6 @@ function App() {
         </div>
       </header>
 
-      {/* Generation Progress */}
-      {isGenerating && (
-        <div className="bg-blue-600 text-white px-4 py-3">
-          <div className="max-w-7xl mx-auto flex items-center justify-center space-x-3">
-            <RefreshCw className="h-5 w-5 animate-spin" />
-            <span className="font-medium">Generating your project plan...</span>
-            <span className="text-blue-200">{generationProgress}</span>
-          </div>
-        </div>
-      )}
-
       {/* All Stages Completed Banner */}
       {allStagesCompleted && (
         <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-3">
@@ -599,14 +264,13 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Project Planning Roadmap</h2>
-            <p className="text-gray-600">AI-generated plan for your {projectData.projectType}</p>
-            {isGenerating && (
-              <div className="mt-4 bg-blue-50 rounded-lg p-4">
-                <p className="text-blue-800 text-sm">
-                  🤖 AI is automatically generating your complete project plan. This may take a few moments...
-                </p>
-              </div>
-            )}
+            <p className="text-gray-600">Follow the path to build your {projectData.projectType}</p>
+            <div className="mt-4 bg-blue-50 rounded-lg p-4">
+              <p className="text-blue-800 text-sm">
+                💡 Click on each stage to generate AI-powered content and customize your project plan. 
+                Mark stages as complete when you're satisfied with the results.
+              </p>
+            </div>
           </div>
 
           {/* Roadmap */}

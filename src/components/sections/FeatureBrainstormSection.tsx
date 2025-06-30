@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useGemini } from '../../hooks/useGemini';
 import { Feature } from '../../types';
 import { Lightbulb, MessageCircle, Plus, Check, X, Sparkles, RefreshCw } from 'lucide-react';
@@ -21,13 +21,24 @@ const FeatureBrainstormSection: React.FC<FeatureBrainstormSectionProps> = ({
   const [chatHistory, setChatHistory] = useState<{role: string, content: string}[]>([]);
 
   const generateMustHaveFeatures = async () => {
-    const prompt = `
-      Based on the following project details, generate essential must-have features:
+    // Build context from all previous decisions
+    const context = `
+      Project Context (use this to inform feature suggestions):
       - Platform: ${projectData.platform}
       - Project Type: ${projectData.projectType}
       - Target Audience: ${projectData.targetAudience}
       - Budget: ${projectData.budget}
       - Timeline: ${projectData.timeline}
+      - Experience Level: ${projectData.experience}
+      ${projectData.name ? `- Project Name: ${projectData.name}` : ''}
+      ${projectData.slogan ? `- Project Slogan: ${projectData.slogan}` : ''}
+      ${projectData.techStack ? `- Tech Stack: ${projectData.techStack.frontend}, ${projectData.techStack.backend}, ${projectData.techStack.database}` : ''}
+    `;
+
+    const prompt = `
+      ${context}
+
+      Based on the project details above, generate essential must-have features for this ${projectData.projectType}.
 
       Generate 6-8 must-have features in JSON format:
       {
@@ -41,7 +52,8 @@ const FeatureBrainstormSection: React.FC<FeatureBrainstormSectionProps> = ({
         ]
       }
 
-      Focus on core functionality that this type of ${projectData.projectType} absolutely needs.
+      Focus on core functionality that this type of ${projectData.projectType} absolutely needs to function properly.
+      Consider the target audience and platform when suggesting features.
     `;
 
     const result = await generateStructuredContent(prompt, apiKey);
@@ -63,13 +75,26 @@ const FeatureBrainstormSection: React.FC<FeatureBrainstormSectionProps> = ({
     setChatHistory(updatedHistory);
     setChatMessage('');
 
-    const contextPrompt = `
+    // Build comprehensive context from all project data
+    const context = `
       Project Context:
       - Platform: ${projectData.platform}
       - Project Type: ${projectData.projectType}
       - Target Audience: ${projectData.targetAudience}
+      - Budget: ${projectData.budget}
+      - Timeline: ${projectData.timeline}
+      - Experience Level: ${projectData.experience}
+      ${projectData.name ? `- Project Name: ${projectData.name}` : ''}
+      ${projectData.slogan ? `- Project Slogan: ${projectData.slogan}` : ''}
+      ${projectData.techStack ? `- Tech Stack: ${projectData.techStack.frontend}, ${projectData.techStack.backend}, ${projectData.techStack.database}` : ''}
+      ${projectData.uiStyle ? `- Design Style: ${projectData.uiStyle.designStyle}` : ''}
       
-      Current Features: ${projectData.features?.map((f: Feature) => f.name).join(', ')}
+      Current Features: ${projectData.features?.map((f: Feature) => f.name).join(', ') || 'None yet'}
+      Selected Features: ${projectData.decidedFeatures?.map((f: Feature) => f.name).join(', ') || 'None yet'}
+    `;
+
+    const contextPrompt = `
+      ${context}
       
       User Question: ${chatMessage}
       
@@ -90,6 +115,8 @@ const FeatureBrainstormSection: React.FC<FeatureBrainstormSectionProps> = ({
       {
         "response": "Your response text"
       }
+
+      Consider all the project context when suggesting features. Make suggestions that fit the platform, target audience, and technical constraints.
     `;
 
     const result = await generateStructuredContent(contextPrompt, apiKey);
@@ -123,12 +150,6 @@ const FeatureBrainstormSection: React.FC<FeatureBrainstormSectionProps> = ({
     const decidedFeatures = projectData.decidedFeatures || [];
     return decidedFeatures.some((f: Feature) => f.id === featureId);
   };
-
-  useEffect(() => {
-    if (apiKey && projectData.projectType && !mustHaveFeatures.length) {
-      generateMustHaveFeatures();
-    }
-  }, [projectData.projectType, apiKey]);
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
