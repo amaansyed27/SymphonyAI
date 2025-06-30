@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI, Modality } from '@google/genai';
 import { useState, useCallback } from 'react';
 
 export const useGemini = () => {
@@ -183,30 +184,19 @@ export const useGemini = () => {
     setError(null);
 
     try {
-      const genAI = new GoogleGenerativeAI(apiKey);
-      
-      // Use the image generation model with retry logic
-      const model = genAI.getGenerativeModel({ 
-        model: 'gemini-2.0-flash-exp'
+      const ai = new GoogleGenAI({ apiKey });
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.0-flash-preview-image-generation',
+        contents: prompt,
+        config: {
+          responseModalities: [Modality.TEXT, Modality.IMAGE],
+        },
       });
-      
-      const generateWithRetry = async () => {
-        const result = await model.generateContent({
-          contents: [{
-            role: 'user',
-            parts: [{
-              text: prompt
-            }]
-          }]
-        });
-        
-        const response = await result.response;
-        
-        // Check if response contains image data
-        const candidates = response.candidates;
-        if (candidates && candidates.length > 0) {
-          const parts = candidates[0].content.parts;
-          
+      const candidates = response.candidates;
+      if (candidates && candidates.length > 0) {
+        const content = candidates[0].content;
+        if (content && content.parts) {
+          const parts = content.parts;
           for (const part of parts) {
             if (part.inlineData && part.inlineData.data) {
               // Convert base64 to blob URL for display
@@ -214,7 +204,6 @@ export const useGemini = () => {
               const mimeType = part.inlineData.mimeType || 'image/png';
               const blob = base64ToBlob(imageData, mimeType);
               const imageUrl = URL.createObjectURL(blob);
-              
               return {
                 imageUrl,
                 imageData,
@@ -223,20 +212,11 @@ export const useGemini = () => {
             }
           }
         }
-        
-        throw new Error('No image generated in response');
-      };
-
-      const result = await retryWithBackoff(generateWithRetry, 3, 2000);
-      setIsLoading(false);
-      return result;
-      
+      }
+      throw new Error('No image generated in response');
     } catch (err: any) {
       console.error('Gemini Logo Generation error:', err);
-      
-      // Provide more user-friendly error messages
       let errorMessage = 'Failed to generate logo';
-      
       if (err.message?.includes('503') || err.message?.includes('overloaded') || err.status === 503) {
         errorMessage = 'The AI service is temporarily overloaded. Please try again in a few moments.';
       } else if (err.message?.includes('quota') || err.message?.includes('limit')) {
@@ -248,7 +228,6 @@ export const useGemini = () => {
       } else if (err.message?.includes('No image generated in response')) {
         errorMessage = 'The AI failed to generate an image. Please try again with a different prompt.';
       }
-      
       setError(errorMessage);
       setIsLoading(false);
       return null;
