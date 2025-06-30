@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ProjectData, RoadmapStage } from './types';
+import LandingPage from './components/LandingPage';
 import Questionnaire from './components/Questionnaire';
 import RoadmapPath from './components/RoadmapPath';
 import SidePanel from './components/SidePanel';
@@ -67,7 +68,7 @@ const ROADMAP_STAGES: RoadmapStage[] = [
 ];
 
 function App() {
-  const [currentStep, setCurrentStep] = useState<'questionnaire' | 'roadmap'>('questionnaire');
+  const [currentStep, setCurrentStep] = useState<'landing' | 'questionnaire' | 'roadmap'>('landing');
   const [projectData, setProjectData] = useState<Partial<ProjectData>>({});
   const [roadmapStages, setRoadmapStages] = useState<RoadmapStage[]>(ROADMAP_STAGES);
   const [selectedStage, setSelectedStage] = useState<RoadmapStage | null>(null);
@@ -83,6 +84,10 @@ function App() {
       setApiKey(savedApiKey);
     }
   }, []);
+
+  const handleGetStarted = () => {
+    setCurrentStep('questionnaire');
+  };
 
   const handleQuestionnaireComplete = (data: Partial<ProjectData>) => {
     const newProjectData = {
@@ -186,10 +191,17 @@ function App() {
     stage.status === 'completed'
   );
 
+  // Landing Page
+  if (currentStep === 'landing') {
+    return <LandingPage onGetStarted={handleGetStarted} />;
+  }
+
+  // Questionnaire
   if (currentStep === 'questionnaire') {
     return <Questionnaire onComplete={handleQuestionnaireComplete} />;
   }
 
+  // Main App (Roadmap)
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Header */}
