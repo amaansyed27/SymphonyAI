@@ -88,7 +88,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
       {/* Panel */}
       <div
         className={`
-          fixed top-0 right-0 h-full w-full max-w-2xl bg-slate-800 shadow-2xl z-50
+          fixed top-0 right-0 h-full w-full sm:max-w-2xl bg-slate-800 shadow-2xl z-50
           transform transition-transform duration-300 ease-in-out border-l border-slate-700
           ${isOpen ? 'translate-x-0' : 'translate-x-full'}
           overflow-y-auto
@@ -97,20 +97,20 @@ const SidePanel: React.FC<SidePanelProps> = ({
         {currentStage && (
           <>
             {/* Header */}
-            <div className="sticky top-0 bg-slate-800 border-b border-slate-700 p-6 z-10">
+            <div className="sticky top-0 bg-slate-800 border-b border-slate-700 p-4 sm:p-6 z-10">
               <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-3">
-                    <h2 className="text-2xl font-bold text-white">{currentStage.title}</h2>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center space-x-2 sm:space-x-3">
+                    <h2 className="text-xl sm:text-2xl font-bold text-white truncate">{currentStage.title}</h2>
                     {currentStage.status === 'completed' && (
-                      <CheckCircle className="h-6 w-6 text-green-400" />
+                      <CheckCircle className="h-5 sm:h-6 w-5 sm:w-6 text-green-400 flex-shrink-0" />
                     )}
                   </div>
-                  <p className="text-gray-400 mt-1">{currentStage.description}</p>
+                  <p className="text-gray-400 mt-1 text-sm sm:text-base">{currentStage.description}</p>
                   
                   {/* Stage Status */}
-                  <div className="mt-3 flex items-center space-x-4">
-                    <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  <div className="mt-3 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                    <div className={`px-3 py-1 rounded-full text-sm font-medium inline-block ${
                       currentStage.status === 'completed' 
                         ? 'bg-green-500/20 text-green-300'
                         : isStageCompleted
@@ -128,7 +128,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
                     {canMarkCompleted && (
                       <button
                         onClick={() => onMarkCompleted(currentStage.id)}
-                        className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                        className="flex items-center px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
                       >
                         <CheckCircle className="h-4 w-4 mr-2" />
                         Mark as Complete
@@ -139,19 +139,19 @@ const SidePanel: React.FC<SidePanelProps> = ({
                 
                 <button
                   onClick={onClose}
-                  className="p-2 hover:bg-slate-700 rounded-lg transition-colors ml-4 text-gray-400 hover:text-white"
+                  className="p-2 hover:bg-slate-700 rounded-lg transition-colors ml-2 sm:ml-4 text-gray-400 hover:text-white flex-shrink-0"
                 >
-                  <X className="h-6 w-6" />
+                  <X className="h-5 sm:h-6 w-5 sm:w-6" />
                 </button>
               </div>
             </div>
 
             {/* Content */}
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               {/* Completion Requirements */}
               {!isStageCompleted && (
-                <div className="mb-6 p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
-                  <h3 className="font-medium text-blue-300 mb-2">To complete this stage:</h3>
+                <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                  <h3 className="font-medium text-blue-300 mb-2 text-sm sm:text-base">To complete this stage:</h3>
                   <ul className="text-sm text-blue-200 space-y-1">
                     {currentStage.id === 'name-logo' && (
                       <>
