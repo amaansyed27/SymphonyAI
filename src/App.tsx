@@ -17,7 +17,7 @@ const ROADMAP_STAGES: RoadmapStage[] = [
     description: 'Generate project name, slogan, and logo concepts',
     status: 'available',
     icon: 'sparkles',
-    position: { x: 15, y: 20 }
+    position: { x: 15, y: 15 }
   },
   {
     id: 'stack-select',
@@ -25,7 +25,7 @@ const ROADMAP_STAGES: RoadmapStage[] = [
     description: 'Choose your technology stack and tools',
     status: 'locked',
     icon: 'settings',
-    position: { x: 35, y: 40 }
+    position: { x: 35, y: 35 }
   },
   {
     id: 'feature-brainstorm',
@@ -33,7 +33,7 @@ const ROADMAP_STAGES: RoadmapStage[] = [
     description: 'Define core features and brainstorm additions',
     status: 'locked',
     icon: 'lightbulb',
-    position: { x: 15, y: 60 }
+    position: { x: 15, y: 55 }
   },
   {
     id: 'ui-design',
@@ -41,7 +41,7 @@ const ROADMAP_STAGES: RoadmapStage[] = [
     description: 'Design color palettes and visual style',
     status: 'locked',
     icon: 'palette',
-    position: { x: 65, y: 25 }
+    position: { x: 65, y: 20 }
   },
   {
     id: 'ui-flow',
@@ -49,7 +49,7 @@ const ROADMAP_STAGES: RoadmapStage[] = [
     description: 'Map out user interface flow and navigation',
     status: 'locked',
     icon: 'git-branch',
-    position: { x: 85, y: 45 }
+    position: { x: 85, y: 40 }
   },
   {
     id: 'builder-tools',
@@ -57,7 +57,7 @@ const ROADMAP_STAGES: RoadmapStage[] = [
     description: 'Get AI tool recommendations and custom prompts',
     status: 'locked',
     icon: 'code',
-    position: { x: 65, y: 70 }
+    position: { x: 65, y: 65 }
   },
   {
     id: 'deployment',
@@ -65,7 +65,7 @@ const ROADMAP_STAGES: RoadmapStage[] = [
     description: 'Choose deployment platform and strategy',
     status: 'locked',
     icon: 'rocket',
-    position: { x: 35, y: 85 }
+    position: { x: 35, y: 80 }
   }
 ];
 
@@ -336,9 +336,9 @@ function App() {
             </div>
           </div>
 
-          {/* Roadmap */}
+          {/* Roadmap - Increased height to accommodate all stages */}
           <div className="bg-slate-800/30 backdrop-blur-lg rounded-3xl border border-slate-700/50 shadow-2xl overflow-hidden">
-            <div style={{ height: '600px' }}>
+            <div style={{ height: '700px' }}>
               <RoadmapPath 
                 stages={roadmapStages} 
                 onStageClick={handleStageClick}
