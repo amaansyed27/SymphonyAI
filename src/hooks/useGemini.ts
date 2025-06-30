@@ -5,6 +5,34 @@ export const useGemini = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Helper function for retry logic with exponential backoff
+  const retryWithBackoff = async (
+    fn: () => Promise<any>,
+    maxRetries: number = 3,
+    baseDelay: number = 1000
+  ): Promise<any> => {
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        return await fn();
+      } catch (error: any) {
+        const isLastAttempt = attempt === maxRetries - 1;
+        const isRetryableError = error.message?.includes('503') || 
+                                 error.message?.includes('overloaded') ||
+                                 error.message?.includes('temporarily unavailable') ||
+                                 error.message?.includes('No image generated in response') ||
+                                 error.status === 503;
+        
+        if (isLastAttempt || !isRetryableError) {
+          throw error;
+        }
+        
+        // Exponential backoff: wait longer between each retry
+        const delay = baseDelay * Math.pow(2, attempt);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  };
+
   const generateContent = useCallback(async (prompt: string, apiKey: string) => {
     if (!apiKey) {
       setError('Please provide a Gemini API key');
@@ -15,18 +43,37 @@ export const useGemini = () => {
     setError(null);
 
     try {
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-      
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
-      
+      const generateWithRetry = async () => {
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+        
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+        
+        return text;
+      };
+
+      const result = await retryWithBackoff(generateWithRetry, 3, 2000);
       setIsLoading(false);
-      return text;
-    } catch (err) {
+      return result;
+    } catch (err: any) {
       console.error('Gemini API error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to generate content');
+      
+      // Provide more user-friendly error messages
+      let errorMessage = 'Failed to generate content';
+      
+      if (err.message?.includes('503') || err.message?.includes('overloaded') || err.status === 503) {
+        errorMessage = 'The AI service is temporarily overloaded. Please try again in a few moments.';
+      } else if (err.message?.includes('quota') || err.message?.includes('limit')) {
+        errorMessage = 'API quota exceeded. Please check your API usage limits.';
+      } else if (err.message?.includes('authentication') || err.message?.includes('API key')) {
+        errorMessage = 'Invalid API key. Please check your Gemini API key.';
+      } else if (err.message?.includes('network') || err.message?.includes('fetch')) {
+        errorMessage = 'Network error. Please check your internet connection and try again.';
+      }
+      
+      setError(errorMessage);
       setIsLoading(false);
       return null;
     }
@@ -46,53 +93,46 @@ export const useGemini = () => {
     setError(null);
 
     try {
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ 
-        model: 'gemini-2.0-flash',
-        generationConfig: {
-          responseMimeType: 'application/json'
-        }
-      });
-      
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
-      
+      const generateWithRetry = async () => {
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ 
+          model: 'gemini-2.0-flash',
+          generationConfig: {
+            responseMimeType: 'application/json'
+          }
+        });
+        
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+        
+        return JSON.parse(text);
+      };
+
+      const result = await retryWithBackoff(generateWithRetry, 3, 2000);
       setIsLoading(false);
-      return JSON.parse(text);
-    } catch (err) {
+      return result;
+    } catch (err: any) {
       console.error('Gemini API error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to generate structured content');
+      
+      // Provide more user-friendly error messages
+      let errorMessage = 'Failed to generate structured content';
+      
+      if (err.message?.includes('503') || err.message?.includes('overloaded') || err.status === 503) {
+        errorMessage = 'The AI service is temporarily overloaded. Please try again in a few moments.';
+      } else if (err.message?.includes('quota') || err.message?.includes('limit')) {
+        errorMessage = 'API quota exceeded. Please check your API usage limits.';
+      } else if (err.message?.includes('authentication') || err.message?.includes('API key')) {
+        errorMessage = 'Invalid API key. Please check your Gemini API key.';
+      } else if (err.message?.includes('network') || err.message?.includes('fetch')) {
+        errorMessage = 'Network error. Please check your internet connection and try again.';
+      }
+      
+      setError(errorMessage);
       setIsLoading(false);
       return null;
     }
   }, []);
-
-  // Helper function for retry logic with exponential backoff
-  const retryWithBackoff = async (
-    fn: () => Promise<any>,
-    maxRetries: number = 3,
-    baseDelay: number = 1000
-  ): Promise<any> => {
-    for (let attempt = 0; attempt < maxRetries; attempt++) {
-      try {
-        return await fn();
-      } catch (error: any) {
-        const isLastAttempt = attempt === maxRetries - 1;
-        const isRetryableError = error.message?.includes('503') || 
-                                 error.message?.includes('overloaded') ||
-                                 error.message?.includes('temporarily unavailable');
-        
-        if (isLastAttempt || !isRetryableError) {
-          throw error;
-        }
-        
-        // Exponential backoff: wait longer between each retry
-        const delay = baseDelay * Math.pow(2, attempt);
-        await new Promise(resolve => setTimeout(resolve, delay));
-      }
-    }
-  };
 
   const generateLogo = useCallback(async (prompt: string, apiKey: string) => {
     if (!apiKey) {
@@ -158,7 +198,7 @@ export const useGemini = () => {
       // Provide more user-friendly error messages
       let errorMessage = 'Failed to generate logo';
       
-      if (err.message?.includes('503') || err.message?.includes('overloaded')) {
+      if (err.message?.includes('503') || err.message?.includes('overloaded') || err.status === 503) {
         errorMessage = 'The AI service is temporarily overloaded. Please try again in a few moments.';
       } else if (err.message?.includes('quota') || err.message?.includes('limit')) {
         errorMessage = 'API quota exceeded. Please check your API usage limits.';
@@ -166,6 +206,8 @@ export const useGemini = () => {
         errorMessage = 'Invalid API key. Please check your Gemini API key.';
       } else if (err.message?.includes('network') || err.message?.includes('fetch')) {
         errorMessage = 'Network error. Please check your internet connection and try again.';
+      } else if (err.message?.includes('No image generated in response')) {
+        errorMessage = 'The AI failed to generate an image. Please try again with a different prompt.';
       }
       
       setError(errorMessage);
