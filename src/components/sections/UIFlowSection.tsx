@@ -46,11 +46,8 @@ const UIFlowSection: React.FC<UIFlowSectionProps> = ({
       // Update project data with the markdown flow for builder tools
       onUpdate({ 
         uiFlowMarkdown: markdownFlow,
-        builderTools: {
-          ...projectData.builderTools,
-          uiFlowReady: true,
-          lastUpdated: new Date().toISOString()
-        }
+        builderToolsUiFlowReady: true,
+        builderToolsLastUpdated: new Date().toISOString()
       });
     }
   }, [markdownFlow]);

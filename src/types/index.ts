@@ -16,6 +16,8 @@ export interface ProjectData {
   uiFlow?: FlowNode[];
   uiFlowMarkdown?: string;
   builderTools?: BuilderTool[];
+  builderToolsUiFlowReady?: boolean;
+  builderToolsLastUpdated?: string;
   deployment?: DeploymentOption;
 }
 
@@ -57,8 +59,6 @@ export interface BuilderTool {
   type: 'frontend' | 'backend' | 'database';
   description: string;
   prompts: string[];
-  uiFlowReady?: boolean;
-  lastUpdated?: string;
 }
 
 export interface DeploymentOption {
