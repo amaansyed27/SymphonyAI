@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useGemini } from '../../hooks/useGemini';
-import { GitBranch, Plus, Trash2, RefreshCw, Sparkles, Download, FileText, Move, MousePointer, Zap, Copy, CheckCircle } from 'lucide-react';
+import { GitBranch, Plus, Trash2, RefreshCw, Sparkles, Download, FileText, Move, MousePointer, Zap, Copy, CheckCircle, X, Maximize2, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import { FlowNode } from '../../types';
 
 interface UIFlowSectionProps {
@@ -18,7 +18,7 @@ const UIFlowSection: React.FC<UIFlowSectionProps> = ({
   const [selectedNode, setSelectedNode] = useState<FlowNode | null>(null);
   const [draggedNode, setDraggedNode] = useState<FlowNode | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [canvasSize, setCanvasSize] = useState({ width: 1200, height: 800 });
+  const [canvasSize, setCanvasSize] = useState({ width: 1600, height: 1000 });
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
@@ -26,6 +26,7 @@ const UIFlowSection: React.FC<UIFlowSectionProps> = ({
   const [markdownFlow, setMarkdownFlow] = useState('');
   const [showMarkdown, setShowMarkdown] = useState(false);
   const [copiedMarkdown, setCopiedMarkdown] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   
   const canvasRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -65,25 +66,25 @@ const UIFlowSection: React.FC<UIFlowSectionProps> = ({
         ]
       }
 
-      Create 10-15 nodes that represent the complete user journey through the app.
+      Create 12-18 nodes that represent the complete user journey through the app.
       Include different types:
       - screens: Main app pages/views (Login, Dashboard, Profile, etc.)
       - actions: User interactions (Submit Form, Upload File, etc.)
       - decisions: Choice points (Authentication Check, Payment Method, etc.)
       
-      Position them in a logical flow from left to right, with proper spacing.
+      Position them in a logical flow from left to right, with proper spacing (200-300px apart).
       Make sure the flow covers the entire user experience from entry to completion.
       Include error states and alternative paths where relevant.
     `;
 
     const result = await generateStructuredContent(prompt, apiKey);
     if (result && result.flow) {
-      // Ensure proper spacing and positioning
+      // Ensure proper spacing and positioning for larger canvas
       const enhancedFlow = result.flow.map((node: any, index: number) => ({
         ...node,
         position: {
-          x: (index % 4) * 250 + 150,
-          y: Math.floor(index / 4) * 150 + 100
+          x: (index % 5) * 300 + 200,
+          y: Math.floor(index / 5) * 200 + 150
         }
       }));
       onUpdate({ uiFlow: enhancedFlow });
@@ -202,7 +203,7 @@ const UIFlowSection: React.FC<UIFlowSectionProps> = ({
       name: 'New Node',
       type: 'screen',
       connections: [],
-      position: { x: 200 + flow.length * 50, y: 200 + flow.length * 30 },
+      position: { x: 400 + flow.length * 50, y: 300 + flow.length * 30 },
       description: 'New flow step'
     };
 
@@ -296,13 +297,21 @@ const UIFlowSection: React.FC<UIFlowSectionProps> = ({
   const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault();
     const delta = e.deltaY > 0 ? 0.9 : 1.1;
-    const newZoom = Math.max(0.3, Math.min(2, zoom * delta));
+    const newZoom = Math.max(0.2, Math.min(3, zoom * delta));
     setZoom(newZoom);
   }, [zoom]);
 
   const resetView = () => {
     setZoom(1);
     setPan({ x: 0, y: 0 });
+  };
+
+  const zoomIn = () => {
+    setZoom(prev => Math.min(3, prev * 1.2));
+  };
+
+  const zoomOut = () => {
+    setZoom(prev => Math.max(0.2, prev / 1.2));
   };
 
   const getNodeColor = (type: string) => {
@@ -332,25 +341,371 @@ const UIFlowSection: React.FC<UIFlowSectionProps> = ({
     URL.revokeObjectURL(url);
   };
 
-  return (
-    <div className="space-y-6">
-      {/* Header Controls */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-white">Interactive UI Flow Designer</h3>
+  // Fullscreen Modal Component
+  const FullscreenModal = () => (
+    <div className="fixed inset-0 bg-slate-900 z-50 flex flex-col">
+      {/* Header */}
+      <div className="bg-slate-800 border-b border-slate-700 p-4 flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <h2 className="text-xl font-bold text-white">UI Flow Designer</h2>
+          <div className="flex items-center space-x-2 text-sm text-gray-300">
+            <span>Zoom: {Math.round(zoom * 100)}%</span>
+            <span>•</span>
+            <span>Nodes: {flow.length}</span>
+          </div>
+        </div>
+        
         <div className="flex items-center space-x-2">
+          {/* Zoom Controls */}
           <button
-            onClick={resetView}
-            className="flex items-center px-3 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition-colors text-sm"
+            onClick={zoomOut}
+            className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors text-white"
+            title="Zoom Out"
           >
-            <MousePointer className="h-4 w-4 mr-2" />
-            Reset View
+            <ZoomOut className="h-4 w-4" />
           </button>
           <button
+            onClick={zoomIn}
+            className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors text-white"
+            title="Zoom In"
+          >
+            <ZoomIn className="h-4 w-4" />
+          </button>
+          <button
+            onClick={resetView}
+            className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors text-white"
+            title="Reset View"
+          >
+            <RotateCcw className="h-4 w-4" />
+          </button>
+          
+          <div className="w-px h-6 bg-slate-600" />
+          
+          {/* Action Buttons */}
+          <button
             onClick={addNode}
-            className="flex items-center px-3 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition-colors"
+            className="flex items-center px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors text-white"
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Node
+          </button>
+          
+          <button
+            onClick={generateFlow}
+            disabled={isLoading || !apiKey}
+            className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200 disabled:opacity-50"
+          >
+            {isLoading ? (
+              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Sparkles className="h-4 w-4 mr-2" />
+            )}
+            Generate Flow
+          </button>
+          
+          <button
+            onClick={() => setShowMarkdown(!showMarkdown)}
+            className="flex items-center px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors text-white"
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            {showMarkdown ? 'Hide' : 'Show'} Markdown
+          </button>
+          
+          <button
+            onClick={() => setIsFullscreen(false)}
+            className="p-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors text-white"
+            title="Exit Fullscreen"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex">
+        {/* Canvas */}
+        <div className="flex-1 relative">
+          <div 
+            ref={canvasRef}
+            className="w-full h-full bg-slate-800/30 cursor-grab active:cursor-grabbing overflow-hidden"
+            onMouseDown={handleCanvasMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+            onWheel={handleWheel}
+          >
+            {flow.length === 0 ? (
+              <div className="flex items-center justify-center h-full text-gray-400">
+                <div className="text-center">
+                  <GitBranch className="h-20 w-20 mx-auto mb-6 text-gray-500" />
+                  <p className="text-2xl font-medium mb-4">No flow created yet</p>
+                  <p className="text-lg">Generate one with AI or add nodes manually</p>
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* SVG for connections */}
+                <svg 
+                  ref={svgRef}
+                  className="absolute inset-0 w-full h-full pointer-events-none"
+                  style={{
+                    transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`
+                  }}
+                >
+                  <defs>
+                    <marker id="arrowhead" markerWidth="12" markerHeight="8" 
+                            refX="11" refY="4" orient="auto">
+                      <polygon points="0 0, 12 4, 0 8" fill="#64748B" />
+                    </marker>
+                    <filter id="glow">
+                      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                      <feMerge> 
+                        <feMergeNode in="coloredBlur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                      </feMerge>
+                    </filter>
+                  </defs>
+                  
+                  {flow.map((node: FlowNode) =>
+                    node.connections.map((targetId: string) => {
+                      const targetNode = flow.find((n: FlowNode) => n.id === targetId);
+                      if (!targetNode) return null;
+                      
+                      return (
+                        <line
+                          key={`${node.id}-${targetId}`}
+                          x1={node.position.x + 80}
+                          y1={node.position.y + 30}
+                          x2={targetNode.position.x + 80}
+                          y2={targetNode.position.y + 30}
+                          stroke="#64748B"
+                          strokeWidth="3"
+                          markerEnd="url(#arrowhead)"
+                          filter="url(#glow)"
+                        />
+                      );
+                    })
+                  )}
+                </svg>
+
+                {/* Nodes */}
+                <div 
+                  className="absolute inset-0"
+                  style={{
+                    transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`
+                  }}
+                >
+                  {flow.map((node: FlowNode) => (
+                    <div
+                      key={node.id}
+                      className={`absolute cursor-move transition-all duration-200 ${
+                        selectedNode?.id === node.id ? 'ring-4 ring-blue-400 ring-opacity-75' : ''
+                      } ${draggedNode?.id === node.id ? 'z-50' : 'z-10'}`}
+                      style={{
+                        left: `${node.position.x}px`,
+                        top: `${node.position.y}px`,
+                        transform: 'translate(-50%, -50%)'
+                      }}
+                      onMouseDown={(e) => handleMouseDown(e, node)}
+                    >
+                      <div className={`px-6 py-4 rounded-xl text-white font-medium shadow-2xl border-2 min-w-[160px] text-center ${getNodeColor(node.type)} hover:scale-105 transition-transform`}>
+                        <div className="font-bold text-lg">{node.name}</div>
+                        <div className="text-sm opacity-80 capitalize mt-1">{node.type}</div>
+                        {node.description && (
+                          <div className="text-xs opacity-70 mt-2 max-w-[140px] truncate">
+                            {node.description}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Canvas Legend */}
+          <div className="absolute bottom-4 left-4 bg-slate-800/90 backdrop-blur-sm border border-slate-600 rounded-lg p-4">
+            <div className="flex items-center space-x-6 text-sm">
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 bg-blue-500 rounded"></div>
+                <span className="text-gray-300">Screen</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 bg-green-500 rounded"></div>
+                <span className="text-gray-300">Action</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 bg-orange-500 rounded"></div>
+                <span className="text-gray-300">Decision</span>
+              </div>
+            </div>
+            <div className="text-xs text-gray-400 mt-2">
+              💡 Drag nodes • Click to select • Scroll to zoom • Drag canvas to pan
+            </div>
+          </div>
+        </div>
+
+        {/* Side Panel */}
+        <div className="w-80 bg-slate-800 border-l border-slate-700 p-6 overflow-y-auto">
+          {selectedNode ? (
+            <>
+              <div className="flex items-center justify-between mb-6">
+                <h4 className="font-medium text-white text-lg">Edit Node</h4>
+                <button
+                  onClick={() => deleteNode(selectedNode.id)}
+                  className="p-2 text-red-400 hover:bg-red-500/20 rounded-lg transition-colors"
+                >
+                  <Trash2 className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Name</label>
+                  <input
+                    type="text"
+                    value={selectedNode.name}
+                    onChange={(e) => updateNode(selectedNode.id, { name: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Type</label>
+                  <select
+                    value={selectedNode.type}
+                    onChange={(e) => updateNode(selectedNode.id, { type: e.target.value as any })}
+                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
+                  >
+                    <option value="screen">Screen</option>
+                    <option value="action">Action</option>
+                    <option value="decision">Decision</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Description</label>
+                  <textarea
+                    value={selectedNode.description || ''}
+                    onChange={(e) => updateNode(selectedNode.id, { description: e.target.value })}
+                    placeholder="Describe what happens at this step..."
+                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-gray-400 resize-none"
+                    rows={4}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Position</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="number"
+                      placeholder="X"
+                      value={Math.round(selectedNode.position.x)}
+                      onChange={(e) => updateNode(selectedNode.id, { 
+                        position: { ...selectedNode.position, x: parseInt(e.target.value) || 0 }
+                      })}
+                      className="px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Y"
+                      value={Math.round(selectedNode.position.y)}
+                      onChange={(e) => updateNode(selectedNode.id, { 
+                        position: { ...selectedNode.position, y: parseInt(e.target.value) || 0 }
+                      })}
+                      className="px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-3">
+                    Connections
+                  </label>
+                  <div className="space-y-2 max-h-40 overflow-y-auto">
+                    {flow.filter((n: FlowNode) => n.id !== selectedNode.id).map((node: FlowNode) => (
+                      <label key={node.id} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedNode.connections.includes(node.id)}
+                          onChange={(e) => {
+                            const connections = e.target.checked
+                              ? [...selectedNode.connections, node.id]
+                              : selectedNode.connections.filter(id => id !== node.id);
+                            updateNode(selectedNode.id, { connections });
+                          }}
+                          className="mr-3 rounded border-slate-600 bg-slate-700 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="text-sm text-gray-300">{node.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-12">
+              <Move className="h-16 w-16 text-gray-500 mx-auto mb-4" />
+              <h4 className="text-xl font-medium text-white mb-2">No Node Selected</h4>
+              <p className="text-gray-400">Click on a node to edit its properties</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Markdown Preview */}
+      {showMarkdown && markdownFlow && (
+        <div className="h-1/3 bg-slate-800 border-t border-slate-700 p-6 overflow-y-auto">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="text-lg font-semibold text-white flex items-center">
+              <FileText className="h-5 w-5 text-purple-400 mr-2" />
+              Generated Markdown Flow
+            </h4>
+            <div className="flex space-x-2">
+              <button
+                onClick={copyMarkdownToClipboard}
+                className="flex items-center px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+              >
+                {copiedMarkdown ? (
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                ) : (
+                  <Copy className="h-4 w-4 mr-2" />
+                )}
+                {copiedMarkdown ? 'Copied!' : 'Copy'}
+              </button>
+              <button
+                onClick={downloadMarkdown}
+                className="flex items-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download
+              </button>
+            </div>
+          </div>
+          
+          <div className="bg-slate-900/50 rounded-lg p-4">
+            <pre className="text-sm text-gray-300 whitespace-pre-wrap font-mono">
+              {markdownFlow}
+            </pre>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <div className="space-y-6">
+      {/* Regular View */}
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold text-white">UI Flow Designer</h3>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => setIsFullscreen(true)}
+            className="flex items-center px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-200"
+          >
+            <Maximize2 className="h-4 w-4 mr-2" />
+            Open Full Designer
           </button>
           <button
             onClick={generateFlow}
@@ -375,292 +730,50 @@ const UIFlowSection: React.FC<UIFlowSectionProps> = ({
         </div>
       )}
 
-      {/* Canvas and Editor Layout */}
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
-        {/* Main Canvas - Takes up 3/4 of the width on large screens */}
-        <div className="xl:col-span-3">
-          <div className="bg-slate-700/30 rounded-xl border border-slate-600 overflow-hidden">
-            {/* Canvas Controls */}
-            <div className="bg-slate-800/50 border-b border-slate-600 p-3 flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-300">
-                  Zoom: {Math.round(zoom * 100)}%
-                </span>
-                <span className="text-sm text-gray-300">
-                  Nodes: {flow.length}
-                </span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => setShowMarkdown(!showMarkdown)}
-                  className="flex items-center px-3 py-1 bg-purple-600 text-white rounded text-sm hover:bg-purple-700 transition-colors"
-                >
-                  <FileText className="h-4 w-4 mr-1" />
-                  {showMarkdown ? 'Hide' : 'Show'} Markdown
-                </button>
-                {markdownFlow && (
-                  <>
-                    <button
-                      onClick={copyMarkdownToClipboard}
-                      className="flex items-center px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors"
-                    >
-                      {copiedMarkdown ? (
-                        <CheckCircle className="h-4 w-4 mr-1" />
-                      ) : (
-                        <Copy className="h-4 w-4 mr-1" />
-                      )}
-                      {copiedMarkdown ? 'Copied!' : 'Copy'}
-                    </button>
-                    <button
-                      onClick={downloadMarkdown}
-                      className="flex items-center px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors"
-                    >
-                      <Download className="h-4 w-4 mr-1" />
-                      Download
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Canvas */}
-            <div 
-              ref={canvasRef}
-              className="relative bg-slate-800/30 cursor-grab active:cursor-grabbing"
-              style={{ height: '600px' }}
-              onMouseDown={handleCanvasMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              onWheel={handleWheel}
-            >
-              {flow.length === 0 ? (
-                <div className="flex items-center justify-center h-full text-gray-400">
-                  <div className="text-center">
-                    <GitBranch className="h-16 w-16 mx-auto mb-4 text-gray-500" />
-                    <p className="text-lg font-medium mb-2">No flow created yet</p>
-                    <p className="text-sm">Generate one with AI or add nodes manually</p>
+      {/* Preview */}
+      <div className="bg-slate-700/30 rounded-xl border border-slate-600 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h4 className="font-medium text-white">Current Flow Preview</h4>
+          <span className="text-sm text-gray-400">{flow.length} nodes</span>
+        </div>
+        
+        {flow.length > 0 ? (
+          <div className="bg-slate-800/50 rounded-lg p-4 h-32 overflow-hidden relative">
+            <div className="flex items-center space-x-2 text-sm">
+              {flow.slice(0, 5).map((node: FlowNode, index: number) => (
+                <React.Fragment key={node.id}>
+                  <div className={`px-3 py-1 rounded text-white text-xs ${getNodeColor(node.type).split(' ')[0]}`}>
+                    {node.name}
                   </div>
-                </div>
-              ) : (
-                <>
-                  {/* SVG for connections */}
-                  <svg 
-                    ref={svgRef}
-                    className="absolute inset-0 w-full h-full pointer-events-none"
-                    style={{
-                      transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`
-                    }}
-                  >
-                    <defs>
-                      <marker id="arrowhead" markerWidth="10" markerHeight="7" 
-                              refX="9" refY="3.5" orient="auto">
-                        <polygon points="0 0, 10 3.5, 0 7" fill="#64748B" />
-                      </marker>
-                      <filter id="glow">
-                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                        <feMerge> 
-                          <feMergeNode in="coloredBlur"/>
-                          <feMergeNode in="SourceGraphic"/>
-                        </feMerge>
-                      </filter>
-                    </defs>
-                    
-                    {flow.map((node: FlowNode) =>
-                      node.connections.map((targetId: string) => {
-                        const targetNode = flow.find((n: FlowNode) => n.id === targetId);
-                        if (!targetNode) return null;
-                        
-                        return (
-                          <line
-                            key={`${node.id}-${targetId}`}
-                            x1={node.position.x + 60}
-                            y1={node.position.y + 25}
-                            x2={targetNode.position.x + 60}
-                            y2={targetNode.position.y + 25}
-                            stroke="#64748B"
-                            strokeWidth="2"
-                            markerEnd="url(#arrowhead)"
-                            filter="url(#glow)"
-                          />
-                        );
-                      })
-                    )}
-                  </svg>
-
-                  {/* Nodes */}
-                  <div 
-                    className="absolute inset-0"
-                    style={{
-                      transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`
-                    }}
-                  >
-                    {flow.map((node: FlowNode) => (
-                      <div
-                        key={node.id}
-                        className={`absolute cursor-move transition-all duration-200 ${
-                          selectedNode?.id === node.id ? 'ring-2 ring-blue-400 ring-opacity-75' : ''
-                        } ${draggedNode?.id === node.id ? 'z-50' : 'z-10'}`}
-                        style={{
-                          left: `${node.position.x}px`,
-                          top: `${node.position.y}px`,
-                          transform: 'translate(-50%, -50%)'
-                        }}
-                        onMouseDown={(e) => handleMouseDown(e, node)}
-                      >
-                        <div className={`px-4 py-3 rounded-xl text-white text-sm font-medium shadow-xl border-2 min-w-[120px] text-center ${getNodeColor(node.type)} hover:scale-105 transition-transform`}>
-                          <div className="font-semibold">{node.name}</div>
-                          <div className="text-xs opacity-75 capitalize mt-1">{node.type}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </>
+                  {index < Math.min(4, flow.length - 1) && (
+                    <span className="text-gray-400">→</span>
+                  )}
+                </React.Fragment>
+              ))}
+              {flow.length > 5 && (
+                <span className="text-gray-400 text-xs">... +{flow.length - 5} more</span>
               )}
             </div>
-
-            {/* Legend */}
-            <div className="bg-slate-800/50 border-t border-slate-600 p-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-6 text-sm">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 bg-blue-500 rounded"></div>
-                    <span className="text-gray-300">Screen</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 bg-green-500 rounded"></div>
-                    <span className="text-gray-300">Action</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 bg-orange-500 rounded"></div>
-                    <span className="text-gray-300">Decision</span>
-                  </div>
-                </div>
-                <div className="text-xs text-gray-400">
-                  💡 Drag nodes to reposition • Click to select • Scroll to zoom • Drag canvas to pan
-                </div>
-              </div>
-            </div>
+            <p className="text-gray-400 text-sm mt-2">
+              Click "Open Full Designer" for complete editing capabilities
+            </p>
           </div>
-        </div>
-
-        {/* Node Editor - Takes up 1/4 of the width on large screens */}
-        <div className="xl:col-span-1">
-          <div className="bg-slate-700/30 border border-slate-600 rounded-xl p-6 h-full">
-            {selectedNode ? (
-              <>
-                <div className="flex items-center justify-between mb-6">
-                  <h4 className="font-medium text-white">Edit Node</h4>
-                  <button
-                    onClick={() => deleteNode(selectedNode.id)}
-                    className="p-2 text-red-400 hover:bg-red-500/20 rounded-lg transition-colors"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Name</label>
-                    <input
-                      type="text"
-                      value={selectedNode.name}
-                      onChange={(e) => updateNode(selectedNode.id, { name: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Type</label>
-                    <select
-                      value={selectedNode.type}
-                      onChange={(e) => updateNode(selectedNode.id, { type: e.target.value as any })}
-                      className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
-                    >
-                      <option value="screen">Screen</option>
-                      <option value="action">Action</option>
-                      <option value="decision">Decision</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Description</label>
-                    <textarea
-                      value={selectedNode.description || ''}
-                      onChange={(e) => updateNode(selectedNode.id, { description: e.target.value })}
-                      placeholder="Describe what happens at this step..."
-                      className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-gray-400 resize-none"
-                      rows={3}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Position</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <input
-                        type="number"
-                        placeholder="X"
-                        value={Math.round(selectedNode.position.x)}
-                        onChange={(e) => updateNode(selectedNode.id, { 
-                          position: { ...selectedNode.position, x: parseInt(e.target.value) || 0 }
-                        })}
-                        className="px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
-                      />
-                      <input
-                        type="number"
-                        placeholder="Y"
-                        value={Math.round(selectedNode.position.y)}
-                        onChange={(e) => updateNode(selectedNode.id, { 
-                          position: { ...selectedNode.position, y: parseInt(e.target.value) || 0 }
-                        })}
-                        className="px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Connections
-                    </label>
-                    <div className="space-y-2">
-                      {flow.filter((n: FlowNode) => n.id !== selectedNode.id).map((node: FlowNode) => (
-                        <label key={node.id} className="flex items-center">
-                          <input
-                            type="checkbox"
-                            checked={selectedNode.connections.includes(node.id)}
-                            onChange={(e) => {
-                              const connections = e.target.checked
-                                ? [...selectedNode.connections, node.id]
-                                : selectedNode.connections.filter(id => id !== node.id);
-                              updateNode(selectedNode.id, { connections });
-                            }}
-                            className="mr-2 rounded border-slate-600 bg-slate-700 text-blue-600 focus:ring-blue-500"
-                          />
-                          <span className="text-sm text-gray-300">{node.name}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div className="text-center py-8">
-                <Move className="h-12 w-12 text-gray-500 mx-auto mb-4" />
-                <h4 className="text-lg font-medium text-white mb-2">No Node Selected</h4>
-                <p className="text-gray-400 text-sm">Click on a node to edit its properties</p>
-              </div>
-            )}
+        ) : (
+          <div className="bg-slate-800/50 rounded-lg p-8 text-center">
+            <GitBranch className="h-12 w-12 text-gray-500 mx-auto mb-3" />
+            <p className="text-gray-400">No flow created yet</p>
+            <p className="text-gray-500 text-sm">Generate one with AI or open the full designer</p>
           </div>
-        </div>
+        )}
       </div>
 
-      {/* Markdown Preview */}
-      {showMarkdown && markdownFlow && (
+      {/* Markdown Export */}
+      {markdownFlow && (
         <div className="bg-slate-700/30 border border-slate-600 rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h4 className="text-lg font-semibold text-white flex items-center">
               <FileText className="h-5 w-5 text-purple-400 mr-2" />
-              Generated Markdown Flow
+              Markdown Flow Ready
             </h4>
             <div className="flex space-x-2">
               <button
@@ -672,7 +785,7 @@ const UIFlowSection: React.FC<UIFlowSectionProps> = ({
                 ) : (
                   <Copy className="h-4 w-4 mr-2" />
                 )}
-                {copiedMarkdown ? 'Copied!' : 'Copy Markdown'}
+                {copiedMarkdown ? 'Copied!' : 'Copy'}
               </button>
               <button
                 onClick={downloadMarkdown}
@@ -684,20 +797,18 @@ const UIFlowSection: React.FC<UIFlowSectionProps> = ({
             </div>
           </div>
           
-          <div className="bg-slate-800/50 rounded-lg p-4 max-h-96 overflow-y-auto">
-            <pre className="text-sm text-gray-300 whitespace-pre-wrap font-mono">
-              {markdownFlow}
-            </pre>
-          </div>
-          
-          <div className="mt-4 p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
+          <div className="p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
             <p className="text-sm text-blue-200">
               <Zap className="h-4 w-4 inline mr-2" />
-              <strong>Builder Tools Integration:</strong> This markdown flow can be used in the Builder Tools section to generate detailed prompts for your selected development tools. The structured flow helps AI understand your app's navigation and user journey.
+              <strong>Builder Tools Integration:</strong> Your flow has been converted to structured markdown. 
+              Use this in the Builder Tools section to generate detailed prompts for your development tools.
             </p>
           </div>
         </div>
       )}
+
+      {/* Fullscreen Modal */}
+      {isFullscreen && <FullscreenModal />}
     </div>
   );
 };
