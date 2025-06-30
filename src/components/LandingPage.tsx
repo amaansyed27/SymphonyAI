@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import clsx from 'clsx';
+import Logo from './Logo';
 import { 
-  Sparkles, ArrowRight, Zap, Target, Palette, Code, 
+  ArrowRight, Zap, Target, Palette, Code, 
   Rocket, Users, CheckCircle, Star, Brain, Lightbulb
 } from 'lucide-react';
 
@@ -43,7 +44,6 @@ const AnimatedSection: React.FC<AnimatedSectionProps> = ({ children, className, 
     </motion.div>
   );
 };
-
 
 // The Enhanced Landing Page Component
 type LandingPageProps = {
@@ -104,10 +104,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
-            <div className="flex items-center space-x-3">
-              <Sparkles className="h-8 w-8 text-blue-400" />
-              <span className="text-2xl font-bold">Symphony</span>
-            </div>
+            <Logo size={32} showText />
             <button
               onClick={onGetStarted}
               className="group hidden sm:flex items-center space-x-2 px-6 py-2 bg-white/10 border border-white/20 rounded-full text-sm font-semibold hover:bg-white/20 transition-colors duration-300"
@@ -298,11 +295,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       {/* --- Footer --- */}
       <footer className="bg-slate-900 border-t border-slate-800 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="flex items-center justify-center space-x-3 mb-6">
-            <Sparkles className="h-7 w-7 text-blue-400" />
-            <span className="text-xl font-bold text-white">Symphony</span>
-          </div>
-          <p className="text-slate-400">© {new Date().getFullYear()} Symphony AI. All Rights Reserved.</p>
+          <Logo size={28} showText />
+          <p className="text-slate-400 mt-4">© {new Date().getFullYear()} Symphony AI. All Rights Reserved.</p>
         </div>
       </footer>
     </div>

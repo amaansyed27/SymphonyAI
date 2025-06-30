@@ -6,7 +6,9 @@ import RoadmapPath from './components/RoadmapPath';
 import SidePanel from './components/SidePanel';
 import APIKeyManager from './components/APIKeyManager';
 import DocumentationModal from './components/DocumentationModal';
-import { Settings, Sparkles, FileText, CheckCircle } from 'lucide-react';
+import Bootloader from './components/Bootloader';
+import Logo from './components/Logo';
+import { Settings, FileText, CheckCircle, ArrowLeft } from 'lucide-react';
 
 const ROADMAP_STAGES: RoadmapStage[] = [
   {
@@ -68,6 +70,7 @@ const ROADMAP_STAGES: RoadmapStage[] = [
 ];
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
   const [currentStep, setCurrentStep] = useState<'landing' | 'questionnaire' | 'roadmap'>('landing');
   const [projectData, setProjectData] = useState<Partial<ProjectData>>({});
   const [roadmapStages, setRoadmapStages] = useState<RoadmapStage[]>(ROADMAP_STAGES);
@@ -85,8 +88,20 @@ function App() {
     }
   }, []);
 
+  const handleBootloaderComplete = () => {
+    setIsLoading(false);
+  };
+
   const handleGetStarted = () => {
     setCurrentStep('questionnaire');
+  };
+
+  const handleBackToLanding = () => {
+    setCurrentStep('landing');
+    setProjectData({});
+    setRoadmapStages(ROADMAP_STAGES);
+    setSelectedStage(null);
+    setSidePanelOpen(false);
   };
 
   const handleQuestionnaireComplete = (data: Partial<ProjectData>) => {
@@ -191,6 +206,11 @@ function App() {
     stage.status === 'completed'
   );
 
+  // Show bootloader on first load
+  if (isLoading) {
+    return <Bootloader onComplete={handleBootloaderComplete} />;
+  }
+
   // Landing Page
   if (currentStep === 'landing') {
     return <LandingPage onGetStarted={handleGetStarted} />;
@@ -198,7 +218,27 @@ function App() {
 
   // Questionnaire
   if (currentStep === 'questionnaire') {
-    return <Questionnaire onComplete={handleQuestionnaireComplete} />;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+        {/* Header with back button */}
+        <header className="p-4">
+          <div className="max-w-2xl mx-auto flex items-center justify-between">
+            <button
+              onClick={handleBackToLanding}
+              className="flex items-center px-4 py-2 text-blue-200 hover:text-white transition-colors"
+            >
+              <ArrowLeft className="h-5 w-5 mr-2" />
+              Back to Home
+            </button>
+            <Logo size={32} showText />
+          </div>
+        </header>
+        
+        <div className="px-4">
+          <Questionnaire onComplete={handleQuestionnaireComplete} />
+        </div>
+      </div>
+    );
   }
 
   // Main App (Roadmap)
@@ -208,26 +248,35 @@ function App() {
       <header className="bg-white/80 backdrop-blur-lg border-b border-white/20 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
-              {projectData.logo ? (
-                <img src={projectData.logo} alt="Project logo" className="h-8 w-8 object-contain" />
-              ) : (
-                <Sparkles className="h-8 w-8 text-blue-600" />
-              )}
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">Symphony</h1>
-                <p className="text-sm text-gray-600">AI Project Planner</p>
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={handleBackToLanding}
+                className="flex items-center px-3 py-2 text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                <ArrowLeft className="h-5 w-5 mr-2" />
+                Home
+              </button>
+              
+              <div className="h-8 w-px bg-gray-300" />
+              
+              <div className="flex items-center space-x-3">
+                {projectData.logo ? (
+                  <img src={projectData.logo} alt="Project logo" className="h-8 w-8 object-contain" />
+                ) : (
+                  <Logo size={32} />
+                )}
+                <div>
+                  <h1 className="text-xl font-bold text-gray-900">
+                    {projectData.name || 'Symphony'}
+                  </h1>
+                  <p className="text-sm text-gray-600">
+                    {projectData.slogan || 'AI Project Planner'}
+                  </p>
+                </div>
               </div>
             </div>
             
             <div className="flex items-center space-x-4">
-              {projectData.name && (
-                <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900">{projectData.name}</p>
-                  <p className="text-xs text-gray-600">{projectData.slogan}</p>
-                </div>
-              )}
-              
               {/* Generate Documentation Button */}
               {allStagesCompleted && (
                 <button
