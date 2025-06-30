@@ -33,12 +33,27 @@ const UIFlowSection: React.FC<UIFlowSectionProps> = ({
 
   const flow = projectData.uiFlow || [];
 
-  // Generate markdown flow whenever flow changes
+  // Generate markdown flow whenever flow changes and auto-send to builder tools
   useEffect(() => {
     if (flow.length > 0) {
       generateMarkdownFlow();
     }
   }, [flow]);
+
+  // Auto-send markdown to builder tools when it's generated
+  useEffect(() => {
+    if (markdownFlow) {
+      // Update project data with the markdown flow for builder tools
+      onUpdate({ 
+        uiFlowMarkdown: markdownFlow,
+        builderTools: {
+          ...projectData.builderTools,
+          uiFlowReady: true,
+          lastUpdated: new Date().toISOString()
+        }
+      });
+    }
+  }, [markdownFlow]);
 
   const generateFlow = async () => {
     const features = projectData.decidedFeatures?.map((f: any) => f.name).join(', ') || 'Basic functionality';
@@ -800,8 +815,7 @@ const UIFlowSection: React.FC<UIFlowSectionProps> = ({
           <div className="p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
             <p className="text-sm text-blue-200">
               <Zap className="h-4 w-4 inline mr-2" />
-              <strong>Builder Tools Integration:</strong> Your flow has been converted to structured markdown. 
-              Use this in the Builder Tools section to generate detailed prompts for your development tools.
+              <strong>Auto-Integrated with Builder Tools:</strong> Your flow has been automatically converted to structured markdown and sent to the Builder Tools section for prompt generation.
             </p>
           </div>
         </div>

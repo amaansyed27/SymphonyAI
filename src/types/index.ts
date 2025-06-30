@@ -14,6 +14,7 @@ export interface ProjectData {
   techStack?: TechStack;
   uiStyle?: UIStyle;
   uiFlow?: FlowNode[];
+  uiFlowMarkdown?: string;
   builderTools?: BuilderTool[];
   deployment?: DeploymentOption;
 }
@@ -48,6 +49,7 @@ export interface FlowNode {
   type: 'screen' | 'action' | 'decision';
   connections: string[];
   position: { x: number; y: number };
+  description?: string;
 }
 
 export interface BuilderTool {
@@ -55,6 +57,8 @@ export interface BuilderTool {
   type: 'frontend' | 'backend' | 'database';
   description: string;
   prompts: string[];
+  uiFlowReady?: boolean;
+  lastUpdated?: string;
 }
 
 export interface DeploymentOption {

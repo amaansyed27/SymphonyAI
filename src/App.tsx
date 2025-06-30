@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ProjectData, RoadmapStage } from './types';
 import LandingPage from './components/LandingPage';
+import Dashboard from './components/Dashboard';
 import Questionnaire from './components/Questionnaire';
 import RoadmapPath from './components/RoadmapPath';
 import SidePanel from './components/SidePanel';
@@ -71,7 +72,7 @@ const ROADMAP_STAGES: RoadmapStage[] = [
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
-  const [currentStep, setCurrentStep] = useState<'landing' | 'questionnaire' | 'roadmap'>('landing');
+  const [currentStep, setCurrentStep] = useState<'landing' | 'dashboard' | 'questionnaire' | 'roadmap'>('landing');
   const [projectData, setProjectData] = useState<Partial<ProjectData>>({});
   const [roadmapStages, setRoadmapStages] = useState<RoadmapStage[]>(ROADMAP_STAGES);
   const [selectedStage, setSelectedStage] = useState<RoadmapStage | null>(null);
@@ -83,60 +84,48 @@ function App() {
   // Load saved data on mount
   useEffect(() => {
     const savedApiKey = localStorage.getItem('symphony-gemini-api-key');
-    const savedProjectData = localStorage.getItem('symphony-project-data');
-    const savedRoadmapStages = localStorage.getItem('symphony-roadmap-stages');
-    const savedCurrentStep = localStorage.getItem('symphony-current-step');
-
+    
     if (savedApiKey) {
       setApiKey(savedApiKey);
     }
-
-    if (savedProjectData) {
-      try {
-        const parsedData = JSON.parse(savedProjectData);
-        setProjectData(parsedData);
-      } catch (error) {
-        console.error('Failed to parse saved project data:', error);
-      }
-    }
-
-    if (savedRoadmapStages) {
-      try {
-        const parsedStages = JSON.parse(savedRoadmapStages);
-        setRoadmapStages(parsedStages);
-      } catch (error) {
-        console.error('Failed to parse saved roadmap stages:', error);
-        // If parsing fails, use default stages with all available
-        setRoadmapStages(ROADMAP_STAGES);
-      }
-    }
-
-    if (savedCurrentStep && (savedCurrentStep === 'roadmap' || savedCurrentStep === 'questionnaire')) {
-      setCurrentStep(savedCurrentStep as 'landing' | 'questionnaire' | 'roadmap');
-    }
   }, []);
 
-  // Save data whenever it changes
+  // Save project data whenever it changes
   useEffect(() => {
-    if (Object.keys(projectData).length > 0) {
-      localStorage.setItem('symphony-project-data', JSON.stringify(projectData));
+    if (projectData.id && Object.keys(projectData).length > 1) {
+      localStorage.setItem(`symphony-project-${projectData.id}`, JSON.stringify(projectData));
     }
   }, [projectData]);
-
-  useEffect(() => {
-    localStorage.setItem('symphony-roadmap-stages', JSON.stringify(roadmapStages));
-  }, [roadmapStages]);
-
-  useEffect(() => {
-    localStorage.setItem('symphony-current-step', currentStep);
-  }, [currentStep]);
 
   const handleBootloaderComplete = () => {
     setIsLoading(false);
   };
 
   const handleGetStarted = () => {
+    setCurrentStep('dashboard');
+  };
+
+  const handleCreateNewProject = () => {
     setCurrentStep('questionnaire');
+    setProjectData({});
+    setRoadmapStages(ROADMAP_STAGES);
+    setSelectedStage(null);
+    setSidePanelOpen(false);
+  };
+
+  const handleLoadProject = (project: ProjectData) => {
+    setProjectData(project);
+    setCurrentStep('roadmap');
+    
+    // Restore roadmap stages based on project progress
+    const updatedStages = ROADMAP_STAGES.map(stage => {
+      const isCompleted = checkStageCompletion(stage.id, project);
+      return {
+        ...stage,
+        status: isCompleted ? 'completed' as const : 'available' as const
+      };
+    });
+    setRoadmapStages(updatedStages);
   };
 
   const handleBackToLanding = () => {
@@ -145,11 +134,14 @@ function App() {
     setRoadmapStages(ROADMAP_STAGES);
     setSelectedStage(null);
     setSidePanelOpen(false);
-    
-    // Clear saved data
-    localStorage.removeItem('symphony-project-data');
-    localStorage.removeItem('symphony-roadmap-stages');
-    localStorage.setItem('symphony-current-step', 'landing');
+  };
+
+  const handleBackToDashboard = () => {
+    setCurrentStep('dashboard');
+    setProjectData({});
+    setRoadmapStages(ROADMAP_STAGES);
+    setSelectedStage(null);
+    setSidePanelOpen(false);
   };
 
   const handleQuestionnaireComplete = (data: Partial<ProjectData>) => {
@@ -163,7 +155,7 @@ function App() {
     setProjectData(newProjectData);
     setCurrentStep('roadmap');
     
-    // All stages are available from the start - no complex progression logic
+    // All stages are available from the start
     const updatedStages = roadmapStages.map(stage => ({
       ...stage,
       status: 'available' as const
@@ -193,7 +185,6 @@ function App() {
   };
 
   const markStageAsCompleted = (stageId: string) => {
-    // Simply mark the stage as completed - no complex progression logic
     const updatedStages = roadmapStages.map(stage =>
       stage.id === stageId
         ? { ...stage, status: 'completed' as const }
@@ -232,6 +223,17 @@ function App() {
     return <LandingPage onGetStarted={handleGetStarted} />;
   }
 
+  // Dashboard
+  if (currentStep === 'dashboard') {
+    return (
+      <Dashboard 
+        onCreateNew={handleCreateNewProject}
+        onLoadProject={handleLoadProject}
+        onBack={handleBackToLanding}
+      />
+    );
+  }
+
   // Questionnaire
   if (currentStep === 'questionnaire') {
     return (
@@ -240,11 +242,11 @@ function App() {
         <header className="p-4">
           <div className="max-w-2xl mx-auto flex items-center justify-between">
             <button
-              onClick={handleBackToLanding}
+              onClick={handleBackToDashboard}
               className="flex items-center px-4 py-2 text-blue-200 hover:text-white transition-colors"
             >
               <ArrowLeft className="h-5 w-5 mr-2" />
-              <span className="hidden sm:inline">Back to Home</span>
+              <span className="hidden sm:inline">Back to Dashboard</span>
               <span className="sm:hidden">Back</span>
             </button>
             <Logo size={48} showText textSize="md" />
@@ -267,11 +269,11 @@ function App() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-2 sm:space-x-4">
               <button
-                onClick={handleBackToLanding}
+                onClick={handleBackToDashboard}
                 className="flex items-center px-2 sm:px-3 py-2 text-gray-400 hover:text-white transition-colors"
               >
                 <ArrowLeft className="h-5 w-5 mr-1 sm:mr-2" />
-                <span className="hidden sm:inline">Home</span>
+                <span className="hidden sm:inline">Dashboard</span>
               </button>
               
               <div className="h-8 w-px bg-slate-600 hidden sm:block" />
