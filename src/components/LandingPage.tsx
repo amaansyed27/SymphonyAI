@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import Logo from './Logo';
 import { 
   ArrowRight, Zap, Target, Palette, Code, 
-  Rocket, Users, CheckCircle, Star, Brain, Lightbulb
+  Rocket, Users, CheckCircle, Star, Brain, Lightbulb, Music, Sparkles
 } from 'lucide-react';
 
 // Reusable component for scroll-triggered animations
@@ -136,6 +136,18 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 for technology, features, design, and deployment in minutes, not weeks.
               </p>
               
+              {/* Tagline */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="mt-6"
+              >
+                <p className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 text-transparent bg-clip-text">
+                  "Where Vision Meets Execution"
+                </p>
+              </motion.div>
+              
               {/* Composer Text */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -180,6 +192,111 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 Watch Demo
               </button>
             </motion.div>
+          </div>
+        </section>
+
+        {/* --- Story Section --- */}
+        <section className="py-24 bg-slate-900/50 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/20 via-purple-900/20 to-pink-900/20"></div>
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <AnimatedSection className="text-center mb-16">
+              <div className="flex items-center justify-center mb-6">
+                <Music className="h-12 w-12 text-purple-400 mr-4" />
+                <h2 className="text-4xl md:text-5xl font-bold">
+                  The Symphony
+                  <span className="block bg-gradient-to-r from-purple-300 to-pink-300 text-transparent bg-clip-text mt-2">
+                    Story
+                  </span>
+                </h2>
+              </div>
+            </AnimatedSection>
+
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <AnimatedSection delay={0.2}>
+                <div className="space-y-6">
+                  <div className="bg-gradient-to-br from-slate-800/80 to-slate-700/80 backdrop-blur-lg rounded-2xl p-8 border border-slate-600/50">
+                    <h3 className="text-2xl font-bold text-white mb-4 flex items-center">
+                      <Sparkles className="h-6 w-6 text-blue-400 mr-3" />
+                      The Problem
+                    </h3>
+                    <p className="text-slate-300 leading-relaxed">
+                      Every developer has felt it — that moment when you have a brilliant idea, but the path from concept to reality feels overwhelming. 
+                      Traditional planning tools treat you like a machine, asking for rigid specifications and linear thinking.
+                    </p>
+                  </div>
+
+                  <div className="bg-gradient-to-br from-purple-800/30 to-pink-800/30 backdrop-blur-lg rounded-2xl p-8 border border-purple-500/30">
+                    <h3 className="text-2xl font-bold text-white mb-4 flex items-center">
+                      <Brain className="h-6 w-6 text-purple-400 mr-3" />
+                      The Vision
+                    </h3>
+                    <p className="text-slate-300 leading-relaxed">
+                      We believe developers aren't just code writers — they're creative architects, strategic thinkers, and visionary composers. 
+                      You don't need another tool that thinks for you; you need one that amplifies your creativity and orchestrates your vision.
+                    </p>
+                  </div>
+                </div>
+              </AnimatedSection>
+
+              <AnimatedSection delay={0.4}>
+                <div className="bg-gradient-to-br from-blue-800/20 via-purple-800/20 to-pink-800/20 backdrop-blur-lg rounded-3xl p-8 border border-blue-500/30">
+                  <h3 className="text-3xl font-bold text-white mb-6 text-center">
+                    The Symphony Approach
+                  </h3>
+                  
+                  <div className="space-y-6">
+                    <div className="flex items-start space-x-4">
+                      <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Music className="h-6 w-6 text-blue-400" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-blue-300 mb-2">AI as Your Musician</h4>
+                        <p className="text-slate-300 text-sm">
+                          Our AI handles the technical execution — researching technologies, analyzing patterns, 
+                          and providing data-driven recommendations with precision and speed.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start space-x-4">
+                      <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Brain className="h-6 w-6 text-purple-400" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-purple-300 mb-2">You as the Composer</h4>
+                        <p className="text-slate-300 text-sm">
+                          You bring the vision, creativity, and strategic thinking. You decide the tempo, 
+                          choose the instruments, and craft the emotional journey of your project.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start space-x-4">
+                      <div className="w-12 h-12 bg-pink-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Sparkles className="h-6 w-6 text-pink-400" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-pink-300 mb-2">Together, We Create Magic</h4>
+                        <p className="text-slate-300 text-sm">
+                          The result isn't just a project plan — it's a masterpiece. A harmonious blend of 
+                          human creativity and AI precision that turns your wildest ideas into executable reality.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-8 p-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl border border-blue-500/20">
+                    <p className="text-center text-lg font-medium text-white italic">
+                      "Every great project starts with a single note. 
+                      <br />
+                      <span className="bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text">
+                        Symphony helps you compose the entire orchestra."
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </AnimatedSection>
+            </div>
           </div>
         </section>
 
