@@ -4,7 +4,8 @@ import Questionnaire from './components/Questionnaire';
 import RoadmapPath from './components/RoadmapPath';
 import SidePanel from './components/SidePanel';
 import APIKeyManager from './components/APIKeyManager';
-import { Settings, Sparkles, RefreshCw } from 'lucide-react';
+import DocumentationModal from './components/DocumentationModal';
+import { Settings, Sparkles, RefreshCw, FileText, CheckCircle } from 'lucide-react';
 import { useGemini } from './hooks/useGemini';
 
 const ROADMAP_STAGES: RoadmapStage[] = [
@@ -73,9 +74,11 @@ function App() {
   const [selectedStage, setSelectedStage] = useState<RoadmapStage | null>(null);
   const [sidePanelOpen, setSidePanelOpen] = useState(false);
   const [apiKeyModalOpen, setApiKeyModalOpen] = useState(false);
+  const [documentationModalOpen, setDocumentationModalOpen] = useState(false);
   const [apiKey, setApiKey] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationProgress, setGenerationProgress] = useState('');
+  const [stageCompletions, setStageCompletions] = useState<Record<string, boolean>>({});
 
   const { generateStructuredContent, generateLogo } = useGemini();
 
@@ -465,6 +468,21 @@ function App() {
     }
   };
 
+  const markStageAsCompleted = (stageId: string) => {
+    setStageCompletions(prev => ({ ...prev, [stageId]: true }));
+    
+    // Update the roadmap stages to show completion
+    const updatedStages = roadmapStages.map(stage =>
+      stage.id === stageId
+        ? { ...stage, status: 'completed' as const }
+        : stage
+    );
+    setRoadmapStages(updatedStages);
+    
+    // Update stage availability for next stages
+    updateStageAvailability(projectData);
+  };
+
   const handleStageClick = (stage: RoadmapStage) => {
     setSelectedStage(stage);
     setSidePanelOpen(true);
@@ -477,12 +495,7 @@ function App() {
     
     // Mark current stage as completed if it meets requirements
     if (selectedStage && checkStageCompletion(selectedStage.id, updatedData)) {
-      const updatedStages = roadmapStages.map(stage =>
-        stage.id === selectedStage.id
-          ? { ...stage, status: 'completed' as const }
-          : stage
-      );
-      setRoadmapStages(updatedStages);
+      markStageAsCompleted(selectedStage.id);
     }
   };
 
@@ -490,6 +503,11 @@ function App() {
     setApiKey(key);
     localStorage.setItem('symphony-gemini-api-key', key);
   };
+
+  // Check if all stages are completed
+  const allStagesCompleted = roadmapStages.every(stage => 
+    stage.status === 'completed' || checkStageCompletion(stage.id, projectData)
+  );
 
   if (currentStep === 'questionnaire') {
     return <Questionnaire onComplete={handleQuestionnaireComplete} />;
@@ -521,6 +539,17 @@ function App() {
                 </div>
               )}
               
+              {/* Generate Documentation Button */}
+              {allStagesCompleted && (
+                <button
+                  onClick={() => setDocumentationModalOpen(true)}
+                  className="flex items-center px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all duration-200 shadow-lg"
+                >
+                  <FileText className="h-5 w-5 mr-2" />
+                  Generate Docs
+                </button>
+              )}
+              
               <button
                 onClick={() => setApiKeyModalOpen(true)}
                 className={`p-2 rounded-lg transition-colors ${
@@ -544,6 +573,22 @@ function App() {
             <RefreshCw className="h-5 w-5 animate-spin" />
             <span className="font-medium">Generating your project plan...</span>
             <span className="text-blue-200">{generationProgress}</span>
+          </div>
+        </div>
+      )}
+
+      {/* All Stages Completed Banner */}
+      {allStagesCompleted && (
+        <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-3">
+          <div className="max-w-7xl mx-auto flex items-center justify-center space-x-3">
+            <CheckCircle className="h-5 w-5" />
+            <span className="font-medium">🎉 All stages completed! Your project plan is ready.</span>
+            <button
+              onClick={() => setDocumentationModalOpen(true)}
+              className="ml-4 px-4 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition-colors text-sm"
+            >
+              Generate Documentation
+            </button>
           </div>
         </div>
       )}
@@ -589,6 +634,23 @@ function App() {
                 </div>
               ))}
             </div>
+            
+            {allStagesCompleted && (
+              <div className="mt-4 p-4 bg-green-50 rounded-lg border border-green-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+                    <span className="text-green-800 font-medium">Project planning complete!</span>
+                  </div>
+                  <button
+                    onClick={() => setDocumentationModalOpen(true)}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                  >
+                    View Documentation
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -599,6 +661,7 @@ function App() {
           currentStage={selectedStage}
           projectData={projectData}
           onUpdateProject={handleProjectUpdate}
+          onMarkCompleted={markStageAsCompleted}
           apiKey={apiKey}
         />
 
@@ -608,6 +671,14 @@ function App() {
           onClose={() => setApiKeyModalOpen(false)}
           apiKey={apiKey}
           onSaveApiKey={handleSaveApiKey}
+        />
+
+        {/* Documentation Modal */}
+        <DocumentationModal
+          isOpen={documentationModalOpen}
+          onClose={() => setDocumentationModalOpen(false)}
+          projectData={projectData}
+          apiKey={apiKey}
         />
       </main>
     </div>

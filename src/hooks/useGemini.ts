@@ -48,7 +48,7 @@ export const useGemini = () => {
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ 
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.0-flash',
         generationConfig: {
           responseMimeType: 'application/json'
         }
@@ -108,7 +108,7 @@ export const useGemini = () => {
       
       // Use the image generation model with retry logic
       const model = genAI.getGenerativeModel({ 
-        model: 'gemini-2.0-flash-preview-image-generation'
+        model: 'gemini-2.0-flash-exp'
       });
       
       const generateWithRetry = async () => {
@@ -118,11 +118,7 @@ export const useGemini = () => {
             parts: [{
               text: prompt
             }]
-          }],
-          // REMOVE THIS LINE:
-          // generationConfig: {
-          //   responseMimeType: 'application/json'
-          // }
+          }]
         });
         
         const response = await result.response;
