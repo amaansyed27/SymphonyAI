@@ -33,7 +33,7 @@ export const useGemini = () => {
     }
   };
 
-  const generateContent = useCallback(async (prompt: string, apiKey: string) => {
+  const generateContent = useCallback(async (prompt: string, apiKey: string, useGrounding: boolean = false) => {
     if (!apiKey) {
       setError('Please provide a Gemini API key');
       return null;
@@ -45,18 +45,35 @@ export const useGemini = () => {
     try {
       const generateWithRetry = async () => {
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
         
-        const result = await model.generateContent(prompt);
+        // Configure model with grounding if requested
+        const modelConfig: any = { model: 'gemini-2.0-flash' };
+        
+        const model = genAI.getGenerativeModel(modelConfig);
+        
+        // Configure generation with grounding tool if requested
+        const config: any = {};
+        if (useGrounding) {
+          config.tools = [{ googleSearch: {} }];
+        }
+        
+        const result = await model.generateContent({
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          ...config
+        });
+        
         const response = await result.response;
         const text = response.text();
         
-        return text;
+        // Extract grounding metadata if available
+        const groundingMetadata = response.candidates?.[0]?.groundingMetadata;
+        
+        return { text, groundingMetadata };
       };
 
       const result = await retryWithBackoff(generateWithRetry, 3, 2000);
       setIsLoading(false);
-      return result;
+      return result.text;
     } catch (err: any) {
       console.error('Gemini API error:', err);
       
@@ -82,6 +99,7 @@ export const useGemini = () => {
   const generateStructuredContent = useCallback(async (
     prompt: string, 
     apiKey: string,
+    useGrounding: boolean = false,
     schema?: any
   ) => {
     if (!apiKey) {
@@ -95,6 +113,7 @@ export const useGemini = () => {
     try {
       const generateWithRetry = async () => {
         const genAI = new GoogleGenerativeAI(apiKey);
+        
         const model = genAI.getGenerativeModel({ 
           model: 'gemini-2.0-flash',
           generationConfig: {
@@ -102,11 +121,31 @@ export const useGemini = () => {
           }
         });
         
-        const result = await model.generateContent(prompt);
+        // Configure generation with grounding tool if requested
+        const config: any = {};
+        if (useGrounding) {
+          config.tools = [{ googleSearch: {} }];
+        }
+        
+        const result = await model.generateContent({
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          ...config
+        });
+        
         const response = await result.response;
         const text = response.text();
         
-        return JSON.parse(text);
+        // Extract grounding metadata if available
+        const groundingMetadata = response.candidates?.[0]?.groundingMetadata;
+        
+        const parsedResult = JSON.parse(text);
+        
+        // Add grounding metadata to result if available
+        if (groundingMetadata) {
+          parsedResult._groundingMetadata = groundingMetadata;
+        }
+        
+        return parsedResult;
       };
 
       const result = await retryWithBackoff(generateWithRetry, 3, 2000);
