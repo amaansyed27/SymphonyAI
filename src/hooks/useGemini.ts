@@ -193,25 +193,23 @@ export const useGemini = () => {
         },
       });
       const candidates = response.candidates;
-      if (
-        candidates &&
-        candidates.length > 0 &&
-        candidates[0].content &&
-        Array.isArray(candidates[0].content.parts)
-      ) {
-        const parts = candidates[0].content.parts;
-        for (const part of parts) {
-          if (part.inlineData && part.inlineData.data) {
-            // Convert base64 to blob URL for display
-            const imageData = part.inlineData.data;
-            const mimeType = part.inlineData.mimeType || 'image/png';
-            const blob = base64ToBlob(imageData, mimeType);
-            const imageUrl = URL.createObjectURL(blob);
-            return {
-              imageUrl,
-              imageData,
-              mimeType
-            };
+      if (candidates && candidates.length > 0) {
+        const content = candidates[0].content;
+        if (content && content.parts) {
+          const parts = content.parts;
+          for (const part of parts) {
+            if (part.inlineData && part.inlineData.data) {
+              // Convert base64 to blob URL for display
+              const imageData = part.inlineData.data;
+              const mimeType = part.inlineData.mimeType || 'image/png';
+              const blob = base64ToBlob(imageData, mimeType);
+              const imageUrl = URL.createObjectURL(blob);
+              return {
+                imageUrl,
+                imageData,
+                mimeType
+              };
+            }
           }
         }
       }
