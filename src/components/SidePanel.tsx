@@ -182,6 +182,19 @@ const SidePanel: React.FC<SidePanelProps> = ({
                 </div>
               )}
 
+              {/* Success Message for Completed Stages */}
+              {currentStage.status === 'completed' && (
+                <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-green-500/10 rounded-lg border border-green-500/20">
+                  <div className="flex items-center">
+                    <CheckCircle className="h-5 w-5 text-green-400 mr-2" />
+                    <h3 className="font-medium text-green-300 text-sm sm:text-base">Stage Completed!</h3>
+                  </div>
+                  <p className="text-sm text-green-200 mt-1">
+                    Great job! You can still make changes or move on to other stages.
+                  </p>
+                </div>
+              )}
+
               <div className="text-gray-300">
                 {renderSectionContent()}
               </div>

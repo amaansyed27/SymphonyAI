@@ -23,7 +23,7 @@ const ROADMAP_STAGES: RoadmapStage[] = [
     id: 'stack-select',
     title: 'Stack Select',
     description: 'Choose your technology stack and tools',
-    status: 'locked',
+    status: 'available',
     icon: 'settings',
     position: { x: 40, y: 30 }
   },
@@ -31,7 +31,7 @@ const ROADMAP_STAGES: RoadmapStage[] = [
     id: 'feature-brainstorm',
     title: 'Feature Brainstorm',
     description: 'Define core features and brainstorm additions',
-    status: 'locked',
+    status: 'available',
     icon: 'lightbulb',
     position: { x: 20, y: 50 }
   },
@@ -39,7 +39,7 @@ const ROADMAP_STAGES: RoadmapStage[] = [
     id: 'ui-design',
     title: 'UI Design',
     description: 'Design color palettes and visual style',
-    status: 'locked',
+    status: 'available',
     icon: 'palette',
     position: { x: 70, y: 20 }
   },
@@ -47,7 +47,7 @@ const ROADMAP_STAGES: RoadmapStage[] = [
     id: 'ui-flow',
     title: 'UI Flow',
     description: 'Map out user interface flow and navigation',
-    status: 'locked',
+    status: 'available',
     icon: 'git-branch',
     position: { x: 80, y: 45 }
   },
@@ -55,7 +55,7 @@ const ROADMAP_STAGES: RoadmapStage[] = [
     id: 'builder-tools',
     title: 'Builder Tools',
     description: 'Get AI tool recommendations and custom prompts',
-    status: 'locked',
+    status: 'available',
     icon: 'code',
     position: { x: 60, y: 65 }
   },
@@ -63,7 +63,7 @@ const ROADMAP_STAGES: RoadmapStage[] = [
     id: 'deployment',
     title: 'Deployment',
     description: 'Choose deployment platform and strategy',
-    status: 'locked',
+    status: 'available',
     icon: 'rocket',
     position: { x: 30, y: 75 }
   }
@@ -106,6 +106,8 @@ function App() {
         setRoadmapStages(parsedStages);
       } catch (error) {
         console.error('Failed to parse saved roadmap stages:', error);
+        // If parsing fails, use default stages with all available
+        setRoadmapStages(ROADMAP_STAGES);
       }
     }
 
@@ -161,29 +163,11 @@ function App() {
     setProjectData(newProjectData);
     setCurrentStep('roadmap');
     
-    // Initialize stage availability
-    updateStageAvailability(newProjectData);
-  };
-
-  const updateStageAvailability = (data: Partial<ProjectData>) => {
-    const updatedStages = roadmapStages.map((stage, index) => {
-      // First stage is always available
-      if (index === 0) {
-        return { ...stage, status: 'available' as const };
-      }
-      
-      // Check if previous stages are completed
-      const previousStagesCompleted = roadmapStages.slice(0, index).every(prevStage => {
-        return prevStage.status === 'completed';
-      });
-      
-      if (previousStagesCompleted) {
-        return { ...stage, status: 'available' as const };
-      }
-      
-      return { ...stage, status: 'locked' as const };
-    });
-    
+    // All stages are available from the start - no complex progression logic
+    const updatedStages = roadmapStages.map(stage => ({
+      ...stage,
+      status: 'available' as const
+    }));
     setRoadmapStages(updatedStages);
   };
 
@@ -209,34 +193,13 @@ function App() {
   };
 
   const markStageAsCompleted = (stageId: string) => {
-    // Update the roadmap stages to show completion
+    // Simply mark the stage as completed - no complex progression logic
     const updatedStages = roadmapStages.map(stage =>
       stage.id === stageId
         ? { ...stage, status: 'completed' as const }
         : stage
     );
     setRoadmapStages(updatedStages);
-    
-    // Update stage availability for next stages - use updated stages
-    const newUpdatedStages = updatedStages.map((stage, index) => {
-      // First stage is always available
-      if (index === 0) {
-        return { ...stage, status: stage.status === 'completed' ? 'completed' : 'available' as const };
-      }
-      
-      // Check if previous stages are completed
-      const previousStagesCompleted = updatedStages.slice(0, index).every(prevStage => {
-        return prevStage.status === 'completed';
-      });
-      
-      if (previousStagesCompleted) {
-        return { ...stage, status: stage.status === 'completed' ? 'completed' : 'available' as const };
-      }
-      
-      return { ...stage, status: 'locked' as const };
-    });
-    
-    setRoadmapStages(newUpdatedStages);
   };
 
   const handleStageClick = (stage: RoadmapStage) => {
@@ -247,9 +210,6 @@ function App() {
   const handleProjectUpdate = (updates: Partial<ProjectData>) => {
     const updatedData = { ...projectData, ...updates };
     setProjectData(updatedData);
-    
-    // Don't auto-complete stages, just update availability
-    updateStageAvailability(updatedData);
   };
 
   const handleSaveApiKey = (key: string) => {
@@ -390,8 +350,8 @@ function App() {
             <p className="text-gray-400 text-sm sm:text-base">Follow the path to build your {projectData.projectType}</p>
             <div className="mt-4 bg-slate-800/50 backdrop-blur-lg rounded-lg p-3 sm:p-4 border border-slate-700/50">
               <p className="text-blue-300 text-xs sm:text-sm">
-                💡 Click on each stage to generate AI-powered content and customize your project plan. 
-                Mark stages as complete when you're satisfied with the results.
+                💡 <strong>All stages are now accessible!</strong> Click on any stage to start working on it. 
+                Complete stages in any order that works for you, and mark them as complete when finished.
               </p>
             </div>
           </div>

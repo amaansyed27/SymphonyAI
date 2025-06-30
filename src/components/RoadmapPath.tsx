@@ -10,7 +10,6 @@ import {
   Code, 
   Database,
   Rocket,
-  Lock,
   CheckCircle,
   Zap
 } from 'lucide-react';
@@ -103,7 +102,7 @@ const RoadmapPath: React.FC<RoadmapPathProps> = ({ stages, onStageClick }) => {
   };
 
   const handleStageClick = (stage: RoadmapStage) => {
-    if (stage.status === 'locked') return;
+    // All stages are now accessible - no restrictions
     
     // On mobile, show tooltip briefly before opening stage
     if (isMobile) {
@@ -143,8 +142,6 @@ const RoadmapPath: React.FC<RoadmapPathProps> = ({ stages, onStageClick }) => {
     switch (status) {
       case 'completed':
         return <CheckCircle className={`${iconSize} text-green-400`} />;
-      case 'locked':
-        return <Lock className={`${iconSize} text-gray-500`} />;
       default:
         return null;
     }
@@ -168,29 +165,20 @@ const RoadmapPath: React.FC<RoadmapPathProps> = ({ stages, onStageClick }) => {
           text: 'text-white',
           bgGlow: 'bg-blue-500/20'
         };
-      case 'locked':
-        return {
-          gradient: 'from-gray-600 to-gray-700',
-          border: 'border-gray-500',
-          glow: 'shadow-gray-500/20',
-          text: 'text-gray-300',
-          bgGlow: 'bg-gray-500/10'
-        };
       default:
         return {
-          gradient: 'from-gray-600 to-gray-700',
-          border: 'border-gray-500',
-          glow: 'shadow-gray-500/20',
-          text: 'text-gray-300',
-          bgGlow: 'bg-gray-500/10'
+          gradient: 'from-blue-500 via-purple-500 to-pink-500',
+          border: 'border-blue-400',
+          glow: 'shadow-blue-500/50',
+          text: 'text-white',
+          bgGlow: 'bg-blue-500/20'
         };
     }
   };
 
   const getConnectionOpacity = (fromStage: RoadmapStage, toStage: RoadmapStage) => {
     if (fromStage.status === 'completed') return 1;
-    if (fromStage.status === 'available') return 0.6;
-    return 0.2;
+    return 0.6; // All connections are visible since all stages are available
   };
 
   const hoveredStageData = stages.find(stage => stage.id === hoveredStage);
@@ -263,7 +251,7 @@ const RoadmapPath: React.FC<RoadmapPathProps> = ({ stages, onStageClick }) => {
               y2={`${nextStage.position.y}%`}
               stroke={isCompleted ? "url(#completedGradient)" : "url(#pathGradient)"}
               strokeWidth={isMobile ? "2" : "3"}
-              strokeDasharray={isCompleted ? "0" : "8,8"}
+              strokeDasharray="0" // All lines are solid since all stages are available
               opacity={opacity}
               filter="url(#glow)"
               initial={{ pathLength: 0 }}
@@ -307,8 +295,7 @@ const RoadmapPath: React.FC<RoadmapPathProps> = ({ stages, onStageClick }) => {
             >
               <div
                 className={`
-                  relative group
-                  ${stage.status === 'locked' ? 'cursor-not-allowed' : 'cursor-pointer'}
+                  relative group cursor-pointer
                   transition-all duration-300
                 `}
               >
@@ -331,10 +318,10 @@ const RoadmapPath: React.FC<RoadmapPathProps> = ({ stages, onStageClick }) => {
                     transition-all duration-300 backdrop-blur-sm
                   `}
                   whileHover={{ 
-                    scale: stage.status !== 'locked' ? (isMobile ? 1.05 : 1.1) : 1,
-                    rotate: stage.status !== 'locked' ? [0, -1, 1, 0] : 0
+                    scale: isMobile ? 1.05 : 1.1,
+                    rotate: [0, -1, 1, 0]
                   }}
-                  whileTap={{ scale: stage.status !== 'locked' ? 0.95 : 1 }}
+                  whileTap={{ scale: 0.95 }}
                   animate={{
                     boxShadow: stage.status === 'available' && isHovered 
                       ? '0 0 40px rgba(59, 130, 246, 0.8)' 
@@ -433,15 +420,13 @@ const RoadmapPath: React.FC<RoadmapPathProps> = ({ stages, onStageClick }) => {
                 </motion.div>
 
                 {/* Click Ripple Effect */}
-                {stage.status !== 'locked' && (
-                  <motion.div
-                    className="absolute inset-0 rounded-2xl pointer-events-none"
-                    initial={false}
-                    whileTap={{
-                      background: "radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%)"
-                    }}
-                  />
-                )}
+                <motion.div
+                  className="absolute inset-0 rounded-2xl pointer-events-none"
+                  initial={false}
+                  whileTap={{
+                    background: "radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%)"
+                  }}
+                />
               </div>
             </motion.div>
           );
@@ -470,12 +455,10 @@ const RoadmapPath: React.FC<RoadmapPathProps> = ({ stages, onStageClick }) => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-xs sm:text-sm text-white">{hoveredStageData.title}</h3>
-                  {hoveredStageData.status === 'available' && (
-                    <div className="flex items-center space-x-1 mt-1">
-                      <Zap className="h-3 w-3 text-yellow-400" />
-                      <span className="text-xs text-yellow-300">Ready to start</span>
-                    </div>
-                  )}
+                  <div className="flex items-center space-x-1 mt-1">
+                    <Zap className="h-3 w-3 text-yellow-400" />
+                    <span className="text-xs text-yellow-300">Ready to start</span>
+                  </div>
                 </div>
               </div>
               
@@ -487,15 +470,12 @@ const RoadmapPath: React.FC<RoadmapPathProps> = ({ stages, onStageClick }) => {
                 <span className={`inline-block px-2 sm:px-3 py-1 text-xs rounded-full font-medium ${
                   hoveredStageData.status === 'completed' 
                     ? 'bg-green-500/20 text-green-300 border border-green-500/30'
-                    : hoveredStageData.status === 'available'
-                    ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-                    : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+                    : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
                 }`}>
-                  {hoveredStageData.status === 'completed' ? '✓ Completed' : 
-                   hoveredStageData.status === 'available' ? (isMobile ? 'Tap to start' : '→ Click to start') : '🔒 Locked'}
+                  {hoveredStageData.status === 'completed' ? '✓ Completed' : (isMobile ? 'Tap to start' : '→ Click to start')}
                 </span>
                 
-                {hoveredStageData.status === 'available' && !isMobile && (
+                {hoveredStageData.status !== 'completed' && !isMobile && (
                   <motion.div
                     animate={{ x: [0, 3, 0] }}
                     transition={{ duration: 1, repeat: Infinity }}
