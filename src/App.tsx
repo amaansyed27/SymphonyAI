@@ -80,13 +80,54 @@ function App() {
   const [documentationModalOpen, setDocumentationModalOpen] = useState(false);
   const [apiKey, setApiKey] = useState('');
 
-  // Load API key from localStorage on mount
+  // Load saved data on mount
   useEffect(() => {
     const savedApiKey = localStorage.getItem('symphony-gemini-api-key');
+    const savedProjectData = localStorage.getItem('symphony-project-data');
+    const savedRoadmapStages = localStorage.getItem('symphony-roadmap-stages');
+    const savedCurrentStep = localStorage.getItem('symphony-current-step');
+
     if (savedApiKey) {
       setApiKey(savedApiKey);
     }
+
+    if (savedProjectData) {
+      try {
+        const parsedData = JSON.parse(savedProjectData);
+        setProjectData(parsedData);
+      } catch (error) {
+        console.error('Failed to parse saved project data:', error);
+      }
+    }
+
+    if (savedRoadmapStages) {
+      try {
+        const parsedStages = JSON.parse(savedRoadmapStages);
+        setRoadmapStages(parsedStages);
+      } catch (error) {
+        console.error('Failed to parse saved roadmap stages:', error);
+      }
+    }
+
+    if (savedCurrentStep && (savedCurrentStep === 'roadmap' || savedCurrentStep === 'questionnaire')) {
+      setCurrentStep(savedCurrentStep as 'landing' | 'questionnaire' | 'roadmap');
+    }
   }, []);
+
+  // Save data whenever it changes
+  useEffect(() => {
+    if (Object.keys(projectData).length > 0) {
+      localStorage.setItem('symphony-project-data', JSON.stringify(projectData));
+    }
+  }, [projectData]);
+
+  useEffect(() => {
+    localStorage.setItem('symphony-roadmap-stages', JSON.stringify(roadmapStages));
+  }, [roadmapStages]);
+
+  useEffect(() => {
+    localStorage.setItem('symphony-current-step', currentStep);
+  }, [currentStep]);
 
   const handleBootloaderComplete = () => {
     setIsLoading(false);
@@ -102,6 +143,11 @@ function App() {
     setRoadmapStages(ROADMAP_STAGES);
     setSelectedStage(null);
     setSidePanelOpen(false);
+    
+    // Clear saved data
+    localStorage.removeItem('symphony-project-data');
+    localStorage.removeItem('symphony-roadmap-stages');
+    localStorage.setItem('symphony-current-step', 'landing');
   };
 
   const handleQuestionnaireComplete = (data: Partial<ProjectData>) => {
@@ -115,20 +161,12 @@ function App() {
     setProjectData(newProjectData);
     setCurrentStep('roadmap');
     
-    // Update stage availability (but don't mark anything as completed)
+    // Initialize stage availability
     updateStageAvailability(newProjectData);
   };
 
   const updateStageAvailability = (data: Partial<ProjectData>) => {
     const updatedStages = roadmapStages.map((stage, index) => {
-      // Check if this stage is completed
-      const isCompleted = checkStageCompletion(stage.id, data);
-      
-      if (isCompleted && stage.status === 'completed') {
-        // Keep it completed if it was already marked as completed
-        return { ...stage, status: 'completed' as const };
-      }
-      
       // First stage is always available
       if (index === 0) {
         return { ...stage, status: 'available' as const };
@@ -179,8 +217,26 @@ function App() {
     );
     setRoadmapStages(updatedStages);
     
-    // Update stage availability for next stages
-    updateStageAvailability(projectData);
+    // Update stage availability for next stages - use updated stages
+    const newUpdatedStages = updatedStages.map((stage, index) => {
+      // First stage is always available
+      if (index === 0) {
+        return { ...stage, status: stage.status === 'completed' ? 'completed' : 'available' as const };
+      }
+      
+      // Check if previous stages are completed
+      const previousStagesCompleted = updatedStages.slice(0, index).every(prevStage => {
+        return prevStage.status === 'completed';
+      });
+      
+      if (previousStagesCompleted) {
+        return { ...stage, status: stage.status === 'completed' ? 'completed' : 'available' as const };
+      }
+      
+      return { ...stage, status: 'locked' as const };
+    });
+    
+    setRoadmapStages(newUpdatedStages);
   };
 
   const handleStageClick = (stage: RoadmapStage) => {
@@ -192,7 +248,7 @@ function App() {
     const updatedData = { ...projectData, ...updates };
     setProjectData(updatedData);
     
-    // Update stage availability but don't auto-complete stages
+    // Don't auto-complete stages, just update availability
     updateStageAvailability(updatedData);
   };
 

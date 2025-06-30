@@ -115,43 +115,43 @@ const NameLogoSection: React.FC<NameLogoSectionProps> = ({
   return (
     <div className="space-y-8">
       {/* Current Selection */}
-      <div className="bg-blue-50 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Current Selection</h3>
+      <div className="bg-slate-700/30 rounded-xl p-6 border border-slate-600">
+        <h3 className="text-lg font-semibold text-white mb-4">Current Selection</h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Project Name</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1">Project Name</label>
             <input
               type="text"
               value={projectData.name || ''}
               onChange={(e) => onUpdate({ name: e.target.value })}
               placeholder="Enter your project name"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-gray-400"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Slogan</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1">Slogan</label>
             <input
               type="text"
               value={projectData.slogan || ''}
               onChange={(e) => onUpdate({ slogan: e.target.value })}
               placeholder="Enter your project slogan"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-gray-400"
             />
           </div>
           
           {/* Current Logo Display */}
           {projectData.logo && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Selected Logo</label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Selected Logo</label>
               <div className="flex items-center space-x-4">
                 <img 
                   src={projectData.logo} 
                   alt="Selected logo" 
-                  className="w-16 h-16 object-contain bg-white rounded-lg border border-gray-200 p-2"
+                  className="w-16 h-16 object-contain bg-slate-600 rounded-lg border border-slate-500 p-2"
                 />
                 <button
                   onClick={() => downloadLogo(projectData.logo, Date.now())}
-                  className="flex items-center px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm"
+                  className="flex items-center px-3 py-2 bg-slate-600 hover:bg-slate-500 rounded-lg transition-colors text-sm text-gray-300"
                 >
                   <Download className="h-4 w-4 mr-2" />
                   Download
@@ -165,7 +165,7 @@ const NameLogoSection: React.FC<NameLogoSectionProps> = ({
       {/* AI Logo Generation */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">AI Logo Generation</h3>
+          <h3 className="text-lg font-semibold text-white">AI Logo Generation</h3>
           <button
             onClick={() => generateLogoImage()}
             disabled={isGeneratingLogo || !apiKey || !projectData.name}
@@ -181,16 +181,16 @@ const NameLogoSection: React.FC<NameLogoSectionProps> = ({
         </div>
 
         {!apiKey && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
-            <p className="text-amber-800 text-sm">
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 mb-4">
+            <p className="text-amber-200 text-sm">
               Please add your Gemini API key to generate logos with AI.
             </p>
           </div>
         )}
 
         {!projectData.name && apiKey && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-            <p className="text-blue-800 text-sm">
+          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mb-4">
+            <p className="text-blue-200 text-sm">
               Please enter a project name first to generate a logo.
             </p>
           </div>
@@ -198,14 +198,14 @@ const NameLogoSection: React.FC<NameLogoSectionProps> = ({
 
         {/* Logo Generation Error Display */}
         {logoError && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+          <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-4">
             <div className="flex items-start">
-              <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 mr-3 flex-shrink-0" />
+              <AlertCircle className="h-5 w-5 text-red-400 mt-0.5 mr-3 flex-shrink-0" />
               <div>
-                <p className="text-red-800 text-sm font-medium">Logo Generation Failed</p>
-                <p className="text-red-700 text-sm mt-1">{logoError}</p>
+                <p className="text-red-300 text-sm font-medium">Logo Generation Failed</p>
+                <p className="text-red-200 text-sm mt-1">{logoError}</p>
                 {logoError.includes('overloaded') && (
-                  <p className="text-red-600 text-xs mt-2">
+                  <p className="text-red-200 text-xs mt-2">
                     💡 Tip: The AI service is busy. Wait a moment and try again, or try generating a different logo concept.
                   </p>
                 )}
@@ -218,27 +218,27 @@ const NameLogoSection: React.FC<NameLogoSectionProps> = ({
         {generatedLogos.length > 0 && (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
             {generatedLogos.map((logo) => (
-              <div key={logo.id} className="bg-white rounded-lg border border-gray-200 p-4 hover:border-purple-300 transition-colors">
+              <div key={logo.id} className="bg-slate-700/30 border border-slate-600 rounded-lg p-4 hover:border-purple-400 transition-colors">
                 <img 
                   src={logo.imageUrl} 
                   alt={logo.description}
-                  className="w-full h-24 object-contain bg-gray-50 rounded-lg mb-3"
+                  className="w-full h-24 object-contain bg-slate-600 rounded-lg mb-3"
                 />
-                <p className="text-xs text-gray-600 mb-3">{logo.description}</p>
+                <p className="text-xs text-gray-400 mb-3">{logo.description}</p>
                 <div className="flex space-x-2">
                   <button
                     onClick={() => selectLogo(logo.imageUrl)}
                     className={`flex-1 px-3 py-2 text-sm rounded transition-colors ${
                       projectData.logo === logo.imageUrl
                         ? 'bg-purple-600 text-white'
-                        : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+                        : 'bg-purple-500/20 text-purple-300 hover:bg-purple-500/30'
                     }`}
                   >
                     {projectData.logo === logo.imageUrl ? 'Selected' : 'Select'}
                   </button>
                   <button
                     onClick={() => downloadLogo(logo.imageUrl, logo.id)}
-                    className="p-2 text-gray-600 hover:text-purple-600 transition-colors"
+                    className="p-2 text-gray-400 hover:text-purple-300 transition-colors"
                   >
                     <Download className="h-4 w-4" />
                   </button>
@@ -252,7 +252,7 @@ const NameLogoSection: React.FC<NameLogoSectionProps> = ({
       {/* AI Text Suggestions */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">AI Text Suggestions</h3>
+          <h3 className="text-lg font-semibold text-white">AI Text Suggestions</h3>
           <button
             onClick={generateSuggestions}
             disabled={isLoading || !apiKey}
@@ -271,15 +271,15 @@ const NameLogoSection: React.FC<NameLogoSectionProps> = ({
           <div className="space-y-6">
             {/* Name Suggestions */}
             <div>
-              <h4 className="font-medium text-gray-900 mb-3">Name Suggestions</h4>
+              <h4 className="font-medium text-white mb-3">Name Suggestions</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {suggestions.names?.map((name: string, index: number) => (
                   <button
                     key={index}
                     onClick={() => selectName(name)}
-                    className="text-left p-3 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200"
+                    className="text-left p-3 bg-slate-700/30 border border-slate-600 rounded-lg hover:border-blue-400 hover:bg-slate-600/50 transition-all duration-200"
                   >
-                    <span className="font-medium text-gray-900">{name}</span>
+                    <span className="font-medium text-white">{name}</span>
                   </button>
                 ))}
               </div>
@@ -287,15 +287,15 @@ const NameLogoSection: React.FC<NameLogoSectionProps> = ({
 
             {/* Slogan Suggestions */}
             <div>
-              <h4 className="font-medium text-gray-900 mb-3">Slogan Suggestions</h4>
+              <h4 className="font-medium text-white mb-3">Slogan Suggestions</h4>
               <div className="space-y-2">
                 {suggestions.slogans?.map((slogan: string, index: number) => (
                   <button
                     key={index}
                     onClick={() => selectSlogan(slogan)}
-                    className="text-left w-full p-3 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200"
+                    className="text-left w-full p-3 bg-slate-700/30 border border-slate-600 rounded-lg hover:border-blue-400 hover:bg-slate-600/50 transition-all duration-200"
                   >
-                    <span className="text-gray-900">{slogan}</span>
+                    <span className="text-white">{slogan}</span>
                   </button>
                 ))}
               </div>
@@ -303,14 +303,14 @@ const NameLogoSection: React.FC<NameLogoSectionProps> = ({
 
             {/* Logo Ideas for Generation */}
             <div>
-              <h4 className="font-medium text-gray-900 mb-3">Logo Concept Ideas</h4>
+              <h4 className="font-medium text-white mb-3">Logo Concept Ideas</h4>
               <div className="space-y-3">
                 {suggestions.logoIdeas?.map((idea: string, index: number) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200"
+                    className="flex items-center justify-between p-4 bg-slate-700/20 rounded-lg border border-slate-600"
                   >
-                    <p className="text-gray-700 flex-1">{idea}</p>
+                    <p className="text-gray-300 flex-1">{idea}</p>
                     <button
                       onClick={() => generateLogoImage(idea)}
                       disabled={isGeneratingLogo || !apiKey || !projectData.name}
@@ -328,9 +328,9 @@ const NameLogoSection: React.FC<NameLogoSectionProps> = ({
       </div>
 
       {/* Manual Input Guide */}
-      <div className="bg-gray-50 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Tips for Great Names & Logos</h3>
-        <div className="space-y-2 text-sm text-gray-600">
+      <div className="bg-slate-700/20 rounded-xl p-6 border border-slate-600">
+        <h3 className="text-lg font-semibold text-white mb-4">Tips for Great Names & Logos</h3>
+        <div className="space-y-2 text-sm text-gray-300">
           <p>• Keep names short, memorable, and easy to pronounce</p>
           <p>• Ensure the name reflects your project's core purpose</p>
           <p>• Make slogans concise and impactful (under 10 words)</p>

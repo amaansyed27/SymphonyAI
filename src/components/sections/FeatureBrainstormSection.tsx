@@ -153,10 +153,10 @@ const FeatureBrainstormSection: React.FC<FeatureBrainstormSectionProps> = ({
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800 border-red-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'low': return 'bg-green-100 text-green-800 border-green-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'high': return 'bg-red-500/20 text-red-300 border-red-500/30';
+      case 'medium': return 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30';
+      case 'low': return 'bg-green-500/20 text-green-300 border-green-500/30';
+      default: return 'bg-gray-500/20 text-gray-300 border-gray-500/30';
     }
   };
 
@@ -164,21 +164,21 @@ const FeatureBrainstormSection: React.FC<FeatureBrainstormSectionProps> = ({
     <div className="space-y-8">
       {/* Decided Features */}
       {projectData.decidedFeatures && projectData.decidedFeatures.length > 0 && (
-        <div className="bg-green-50 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <Check className="h-5 w-5 text-green-600 mr-2" />
+        <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+            <Check className="h-5 w-5 text-green-400 mr-2" />
             Selected Features ({projectData.decidedFeatures.length})
           </h3>
           <div className="grid gap-3">
             {projectData.decidedFeatures.map((feature: Feature) => (
-              <div key={feature.id} className="flex items-center justify-between bg-white p-3 rounded-lg border border-green-200">
+              <div key={feature.id} className="flex items-center justify-between bg-slate-700/30 p-3 rounded-lg border border-green-500/30">
                 <div className="flex-1">
-                  <h4 className="font-medium text-gray-900">{feature.name}</h4>
-                  <p className="text-sm text-gray-600">{feature.description}</p>
+                  <h4 className="font-medium text-white">{feature.name}</h4>
+                  <p className="text-sm text-gray-300">{feature.description}</p>
                 </div>
                 <button
                   onClick={() => removeFeatureFromProject(feature.id)}
-                  className="ml-3 p-1 text-red-600 hover:bg-red-100 rounded"
+                  className="ml-3 p-1 text-red-400 hover:bg-red-500/20 rounded"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -191,7 +191,7 @@ const FeatureBrainstormSection: React.FC<FeatureBrainstormSectionProps> = ({
       {/* Must-Have Features */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Must-Have Features</h3>
+          <h3 className="text-lg font-semibold text-white">Must-Have Features</h3>
           <button
             onClick={generateMustHaveFeatures}
             disabled={isLoading || !apiKey}
@@ -207,8 +207,8 @@ const FeatureBrainstormSection: React.FC<FeatureBrainstormSectionProps> = ({
         </div>
 
         {!apiKey && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
-            <p className="text-amber-800 text-sm">
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 mb-4">
+            <p className="text-amber-200 text-sm">
               Please add your Gemini API key to generate feature suggestions.
             </p>
           </div>
@@ -216,19 +216,19 @@ const FeatureBrainstormSection: React.FC<FeatureBrainstormSectionProps> = ({
 
         <div className="grid gap-4">
           {mustHaveFeatures.map((feature) => (
-            <div key={feature.id} className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
+            <div key={feature.id} className="border border-slate-600 rounded-lg p-4 hover:border-blue-400 transition-colors bg-slate-700/20">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center space-x-2 mb-2">
-                    <h4 className="font-medium text-gray-900">{feature.name}</h4>
+                    <h4 className="font-medium text-white">{feature.name}</h4>
                     <span className={`px-2 py-1 text-xs rounded border ${getPriorityColor(feature.priority)}`}>
                       {feature.priority}
                     </span>
-                    <span className="bg-blue-100 text-blue-800 px-2 py-1 text-xs rounded">
+                    <span className="bg-blue-500/20 text-blue-300 px-2 py-1 text-xs rounded">
                       {feature.category}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600">{feature.description}</p>
+                  <p className="text-sm text-gray-300">{feature.description}</p>
                 </div>
                 <button
                   onClick={() => isFeatureSelected(feature.id) 
@@ -236,8 +236,8 @@ const FeatureBrainstormSection: React.FC<FeatureBrainstormSectionProps> = ({
                     : addFeatureToProject(feature)}
                   className={`ml-3 p-2 rounded-lg transition-colors ${
                     isFeatureSelected(feature.id)
-                      ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                      : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                      ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+                      : 'bg-blue-500/20 text-blue-400 hover:bg-blue-500/30'
                   }`}
                 >
                   {isFeatureSelected(feature.id) ? (
@@ -253,16 +253,16 @@ const FeatureBrainstormSection: React.FC<FeatureBrainstormSectionProps> = ({
       </div>
 
       {/* Feature Brainstorm Chat */}
-      <div className="border border-gray-200 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <MessageCircle className="h-5 w-5 text-blue-600 mr-2" />
+      <div className="border border-slate-600 rounded-xl p-6 bg-slate-700/20">
+        <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+          <MessageCircle className="h-5 w-5 text-blue-400 mr-2" />
           Feature Brainstorm Chat
         </h3>
 
         {/* Chat History */}
-        <div className="bg-gray-50 rounded-lg p-4 max-h-64 overflow-y-auto mb-4">
+        <div className="bg-slate-600/30 rounded-lg p-4 max-h-64 overflow-y-auto mb-4">
           {chatHistory.length === 0 ? (
-            <p className="text-gray-500 text-sm">
+            <p className="text-gray-400 text-sm">
               Ask me about feature ideas for your {projectData.projectType}. For example:
               "What authentication features should I include?" or "Suggest some unique features for my project"
             </p>
@@ -273,8 +273,8 @@ const FeatureBrainstormSection: React.FC<FeatureBrainstormSectionProps> = ({
                   key={index}
                   className={`p-3 rounded-lg ${
                     message.role === 'user'
-                      ? 'bg-blue-100 text-blue-900 ml-8'
-                      : 'bg-white text-gray-900 mr-8'
+                      ? 'bg-blue-500/20 text-blue-100 ml-8'
+                      : 'bg-slate-700/50 text-gray-200 mr-8'
                   }`}
                 >
                   <p className="text-sm">{message.content}</p>
@@ -292,7 +292,7 @@ const FeatureBrainstormSection: React.FC<FeatureBrainstormSectionProps> = ({
             onChange={(e) => setChatMessage(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleChatSubmit()}
             placeholder="Ask about feature ideas..."
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="flex-1 px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-gray-400"
             disabled={!apiKey}
           />
           <button
@@ -312,22 +312,22 @@ const FeatureBrainstormSection: React.FC<FeatureBrainstormSectionProps> = ({
       {/* Brainstormed Features */}
       {brainstormFeatures.length > 0 && (
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Brainstormed Features</h3>
+          <h3 className="text-lg font-semibold text-white mb-4">Brainstormed Features</h3>
           <div className="grid gap-4">
             {brainstormFeatures.map((feature) => (
-              <div key={feature.id} className="border border-purple-200 rounded-lg p-4 bg-purple-50">
+              <div key={feature.id} className="border border-purple-500/30 rounded-lg p-4 bg-purple-500/10">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
-                      <h4 className="font-medium text-gray-900">{feature.name}</h4>
+                      <h4 className="font-medium text-white">{feature.name}</h4>
                       <span className={`px-2 py-1 text-xs rounded border ${getPriorityColor(feature.priority)}`}>
                         {feature.priority}
                       </span>
-                      <span className="bg-purple-100 text-purple-800 px-2 py-1 text-xs rounded">
+                      <span className="bg-purple-500/20 text-purple-300 px-2 py-1 text-xs rounded">
                         {feature.category}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600">{feature.description}</p>
+                    <p className="text-sm text-gray-300">{feature.description}</p>
                   </div>
                   <button
                     onClick={() => isFeatureSelected(feature.id) 
@@ -335,8 +335,8 @@ const FeatureBrainstormSection: React.FC<FeatureBrainstormSectionProps> = ({
                       : addFeatureToProject(feature)}
                     className={`ml-3 p-2 rounded-lg transition-colors ${
                       isFeatureSelected(feature.id)
-                        ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                        : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                        ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+                        : 'bg-blue-500/20 text-blue-400 hover:bg-blue-500/30'
                     }`}
                   >
                     {isFeatureSelected(feature.id) ? (
