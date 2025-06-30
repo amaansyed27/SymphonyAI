@@ -95,7 +95,7 @@ const APIKeyManager: React.FC<APIKeyManagerProps> = ({
             <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 mb-6">
               <p className="text-sm text-amber-200">
                 <strong>Note:</strong> Your API key is stored locally in your browser and never sent to our servers. 
-                It's only used to communicate directly with Google's Gemini API.
+                It's only used to communicate directly with Google\'s Gemini API.
               </p>
             </div>
           </div>
