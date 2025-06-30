@@ -135,12 +135,36 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 The world's most intelligent project planning assistant. Get AI-powered recommendations 
                 for technology, features, design, and deployment in minutes, not weeks.
               </p>
+              
+              {/* Composer Text */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+                className="mt-8 max-w-3xl mx-auto"
+              >
+                <div className="bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-pink-500/10 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6">
+                  <p className="text-lg md:text-xl text-slate-200 leading-relaxed italic">
+                    🎵 <strong className="text-blue-300">AI is the musician</strong> — it follows logic and plays the instrument of code.
+                    <br />
+                    But <strong className="text-purple-300">vibe coders?</strong>
+                    <br />
+                    <strong className="text-pink-300">We're the composers.</strong>
+                    <br />
+                    We don't just follow logic — we orchestrate it.
+                    <br />
+                    <strong className="bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text">
+                      We play the entire symphony.
+                    </strong>
+                  </p>
+                </div>
+              </motion.div>
             </motion.div>
             
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
               className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4"
             >
               <button
