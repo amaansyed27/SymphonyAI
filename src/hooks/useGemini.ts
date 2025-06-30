@@ -80,8 +80,8 @@ export const useGemini = () => {
       } catch (error: any) {
         const isLastAttempt = attempt === maxRetries - 1;
         const isRetryableError = error.message?.includes('503') || 
-                                error.message?.includes('overloaded') ||
-                                error.message?.includes('temporarily unavailable');
+                                 error.message?.includes('overloaded') ||
+                                 error.message?.includes('temporarily unavailable');
         
         if (isLastAttempt || !isRetryableError) {
           throw error;
@@ -119,9 +119,10 @@ export const useGemini = () => {
               text: prompt
             }]
           }],
-          generationConfig: {
-            responseMimeType: 'application/json'
-          }
+          // REMOVE THIS LINE:
+          // generationConfig: {
+          //   responseMimeType: 'application/json'
+          // }
         });
         
         const response = await result.response;
