@@ -219,7 +219,7 @@ function App() {
   // Questionnaire
   if (currentStep === 'questionnaire') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
         {/* Header with back button */}
         <header className="p-4">
           <div className="max-w-2xl mx-auto flex items-center justify-between">
@@ -230,7 +230,7 @@ function App() {
               <ArrowLeft className="h-5 w-5 mr-2" />
               Back to Home
             </button>
-            <Logo size={48} showText />
+            <Logo size={48} showText textSize="md" />
           </div>
         </header>
         
@@ -243,21 +243,21 @@ function App() {
 
   // Main App (Roadmap)
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-lg border-b border-white/20 sticky top-0 z-30">
+      <header className="bg-slate-800/80 backdrop-blur-lg border-b border-slate-700/50 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <button
                 onClick={handleBackToLanding}
-                className="flex items-center px-3 py-2 text-gray-600 hover:text-gray-900 transition-colors"
+                className="flex items-center px-3 py-2 text-gray-400 hover:text-white transition-colors"
               >
                 <ArrowLeft className="h-5 w-5 mr-2" />
                 Home
               </button>
               
-              <div className="h-8 w-px bg-gray-300" />
+              <div className="h-8 w-px bg-slate-600" />
               
               <div className="flex items-center space-x-3">
                 {projectData.logo ? (
@@ -266,11 +266,11 @@ function App() {
                   <Logo size={40} />
                 )}
                 <div>
-                  <h1 className="text-xl font-bold text-gray-900">
+                  <h1 className="text-xl font-bold text-white">
                     {projectData.name || 'Symphony'}
                   </h1>
                   {projectData.slogan && (
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-400">
                       {projectData.slogan}
                     </p>
                   )}
@@ -294,8 +294,8 @@ function App() {
                 onClick={() => setApiKeyModalOpen(true)}
                 className={`p-2 rounded-lg transition-colors ${
                   apiKey 
-                    ? 'bg-green-100 text-green-700 hover:bg-green-200' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30' 
+                    : 'bg-slate-700 text-gray-400 hover:bg-slate-600'
                 }`}
                 title={apiKey ? 'API Key Configured' : 'Configure API Key'}
               >
@@ -326,10 +326,10 @@ function App() {
       <main className="relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Project Planning Roadmap</h2>
-            <p className="text-gray-600">Follow the path to build your {projectData.projectType}</p>
-            <div className="mt-4 bg-blue-50 rounded-lg p-4">
-              <p className="text-blue-800 text-sm">
+            <h2 className="text-3xl font-bold text-white mb-2">Project Planning Roadmap</h2>
+            <p className="text-gray-400">Follow the path to build your {projectData.projectType}</p>
+            <div className="mt-4 bg-slate-800/50 backdrop-blur-lg rounded-lg p-4 border border-slate-700/50">
+              <p className="text-blue-300 text-sm">
                 💡 Click on each stage to generate AI-powered content and customize your project plan. 
                 Mark stages as complete when you're satisfied with the results.
               </p>
@@ -337,7 +337,7 @@ function App() {
           </div>
 
           {/* Roadmap */}
-          <div className="bg-white/60 backdrop-blur-lg rounded-3xl border border-white/20 shadow-xl overflow-hidden">
+          <div className="bg-slate-800/30 backdrop-blur-lg rounded-3xl border border-slate-700/50 shadow-2xl overflow-hidden">
             <div style={{ height: '600px' }}>
               <RoadmapPath 
                 stages={roadmapStages} 
@@ -347,8 +347,8 @@ function App() {
           </div>
 
           {/* Progress Summary */}
-          <div className="mt-8 bg-white/60 backdrop-blur-lg rounded-2xl border border-white/20 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Progress Summary</h3>
+          <div className="mt-8 bg-slate-800/30 backdrop-blur-lg rounded-2xl border border-slate-700/50 p-6">
+            <h3 className="text-lg font-semibold text-white mb-4">Progress Summary</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
                 { label: 'Completed', count: roadmapStages.filter(s => s.status === 'completed').length, color: 'green' },
@@ -357,18 +357,23 @@ function App() {
                 { label: 'Total', count: roadmapStages.length, color: 'purple' }
               ].map((stat) => (
                 <div key={stat.label} className="text-center">
-                  <div className={`text-2xl font-bold text-${stat.color}-600`}>{stat.count}</div>
-                  <div className="text-sm text-gray-600">{stat.label}</div>
+                  <div className={`text-2xl font-bold ${
+                    stat.color === 'green' ? 'text-green-400' :
+                    stat.color === 'blue' ? 'text-blue-400' :
+                    stat.color === 'gray' ? 'text-gray-400' :
+                    'text-purple-400'
+                  }`}>{stat.count}</div>
+                  <div className="text-sm text-gray-400">{stat.label}</div>
                 </div>
               ))}
             </div>
             
             {allStagesCompleted && (
-              <div className="mt-4 p-4 bg-green-50 rounded-lg border border-green-200">
+              <div className="mt-4 p-4 bg-green-500/10 rounded-lg border border-green-500/20">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-                    <span className="text-green-800 font-medium">Project planning complete!</span>
+                    <CheckCircle className="h-5 w-5 text-green-400 mr-2" />
+                    <span className="text-green-300 font-medium">Project planning complete!</span>
                   </div>
                   <button
                     onClick={() => setDocumentationModalOpen(true)}

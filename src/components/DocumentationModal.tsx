@@ -262,27 +262,27 @@ ${documentation.nextSteps?.successMetrics?.map((metric: string) => `- ${metric}`
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Project Description</h3>
-              <p className="text-gray-700">{documentation.projectOverview?.description}</p>
+              <h3 className="text-lg font-semibold text-white mb-3">Project Description</h3>
+              <p className="text-gray-300">{documentation.projectOverview?.description}</p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Objectives</h3>
+              <h3 className="text-lg font-semibold text-white mb-3">Objectives</h3>
               <ul className="space-y-2">
                 {documentation.projectOverview?.objectives?.map((obj: string, index: number) => (
                   <li key={index} className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-700">{obj}</span>
+                    <CheckCircle className="h-5 w-5 text-green-400 mr-2 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-300">{obj}</span>
                   </li>
                 ))}
               </ul>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Target Market</h3>
-              <p className="text-gray-700">{documentation.projectOverview?.targetMarket}</p>
+              <h3 className="text-lg font-semibold text-white mb-3">Target Market</h3>
+              <p className="text-gray-300">{documentation.projectOverview?.targetMarket}</p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Value Proposition</h3>
-              <p className="text-gray-700">{documentation.projectOverview?.valueProposition}</p>
+              <h3 className="text-lg font-semibold text-white mb-3">Value Proposition</h3>
+              <p className="text-gray-300">{documentation.projectOverview?.valueProposition}</p>
             </div>
           </div>
         );
@@ -291,31 +291,31 @@ ${documentation.nextSteps?.successMetrics?.map((metric: string) => `- ${metric}`
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">System Architecture</h3>
-              <p className="text-gray-700">{documentation.technicalSpecifications?.architecture}</p>
+              <h3 className="text-lg font-semibold text-white mb-3">System Architecture</h3>
+              <p className="text-gray-300">{documentation.technicalSpecifications?.architecture}</p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Technology Stack Rationale</h3>
-              <p className="text-gray-700">{documentation.technicalSpecifications?.techStackRationale}</p>
+              <h3 className="text-lg font-semibold text-white mb-3">Technology Stack Rationale</h3>
+              <p className="text-gray-300">{documentation.technicalSpecifications?.techStackRationale}</p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Scalability Considerations</h3>
-              <p className="text-gray-700">{documentation.technicalSpecifications?.scalabilityConsiderations}</p>
+              <h3 className="text-lg font-semibold text-white mb-3">Scalability Considerations</h3>
+              <p className="text-gray-300">{documentation.technicalSpecifications?.scalabilityConsiderations}</p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Security Measures</h3>
+              <h3 className="text-lg font-semibold text-white mb-3">Security Measures</h3>
               <ul className="space-y-2">
                 {documentation.technicalSpecifications?.securityMeasures?.map((measure: string, index: number) => (
                   <li key={index} className="flex items-start">
-                    <span className="text-blue-600 mr-2">•</span>
-                    <span className="text-gray-700">{measure}</span>
+                    <span className="text-blue-400 mr-2">•</span>
+                    <span className="text-gray-300">{measure}</span>
                   </li>
                 ))}
               </ul>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Performance Targets</h3>
-              <p className="text-gray-700">{documentation.technicalSpecifications?.performanceTargets}</p>
+              <h3 className="text-lg font-semibold text-white mb-3">Performance Targets</h3>
+              <p className="text-gray-300">{documentation.technicalSpecifications?.performanceTargets}</p>
             </div>
           </div>
         );
@@ -324,28 +324,28 @@ ${documentation.nextSteps?.successMetrics?.map((metric: string) => `- ${metric}`
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Overall Timeline</h3>
-              <p className="text-gray-700">{documentation.developmentPlan?.timeline}</p>
+              <h3 className="text-lg font-semibold text-white mb-3">Overall Timeline</h3>
+              <p className="text-gray-300">{documentation.developmentPlan?.timeline}</p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Development Phases</h3>
+              <h3 className="text-lg font-semibold text-white mb-3">Development Phases</h3>
               <div className="space-y-4">
                 {documentation.developmentPlan?.phases?.map((phase: any, index: number) => (
-                  <div key={index} className="border border-gray-200 rounded-lg p-4">
-                    <h4 className="font-medium text-gray-900 mb-2">{phase.name}</h4>
-                    <p className="text-sm text-gray-600 mb-2">Duration: {phase.duration}</p>
+                  <div key={index} className="border border-slate-600 rounded-lg p-4 bg-slate-700/30">
+                    <h4 className="font-medium text-white mb-2">{phase.name}</h4>
+                    <p className="text-sm text-gray-400 mb-2">Duration: {phase.duration}</p>
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
-                        <p className="text-sm font-medium text-gray-700 mb-1">Deliverables:</p>
-                        <ul className="text-sm text-gray-600">
+                        <p className="text-sm font-medium text-gray-300 mb-1">Deliverables:</p>
+                        <ul className="text-sm text-gray-400">
                           {phase.deliverables?.map((deliverable: string, i: number) => (
                             <li key={i}>• {deliverable}</li>
                           ))}
                         </ul>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-700 mb-1">Milestones:</p>
-                        <ul className="text-sm text-gray-600">
+                        <p className="text-sm font-medium text-gray-300 mb-1">Milestones:</p>
+                        <ul className="text-sm text-gray-400">
                           {phase.milestones?.map((milestone: string, i: number) => (
                             <li key={i}>• {milestone}</li>
                           ))}
@@ -357,16 +357,16 @@ ${documentation.nextSteps?.successMetrics?.map((metric: string) => `- ${metric}`
               </div>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Resource Requirements</h3>
-              <p className="text-gray-700">{documentation.developmentPlan?.resourceRequirements}</p>
+              <h3 className="text-lg font-semibold text-white mb-3">Resource Requirements</h3>
+              <p className="text-gray-300">{documentation.developmentPlan?.resourceRequirements}</p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Risk Assessment</h3>
+              <h3 className="text-lg font-semibold text-white mb-3">Risk Assessment</h3>
               <ul className="space-y-2">
                 {documentation.developmentPlan?.riskAssessment?.map((risk: string, index: number) => (
                   <li key={index} className="flex items-start">
-                    <span className="text-red-600 mr-2">⚠</span>
-                    <span className="text-gray-700">{risk}</span>
+                    <span className="text-red-400 mr-2">⚠</span>
+                    <span className="text-gray-300">{risk}</span>
                   </li>
                 ))}
               </ul>
@@ -378,33 +378,33 @@ ${documentation.nextSteps?.successMetrics?.map((metric: string) => `- ${metric}`
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Setup Instructions</h3>
+              <h3 className="text-lg font-semibold text-white mb-3">Setup Instructions</h3>
               <ol className="space-y-2">
                 {documentation.implementationGuide?.setupInstructions?.map((step: string, index: number) => (
                   <li key={index} className="flex items-start">
                     <span className="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5 flex-shrink-0">
                       {index + 1}
                     </span>
-                    <span className="text-gray-700">{step}</span>
+                    <span className="text-gray-300">{step}</span>
                   </li>
                 ))}
               </ol>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Development Workflow</h3>
-              <p className="text-gray-700">{documentation.implementationGuide?.developmentWorkflow}</p>
+              <h3 className="text-lg font-semibold text-white mb-3">Development Workflow</h3>
+              <p className="text-gray-300">{documentation.implementationGuide?.developmentWorkflow}</p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Testing Strategy</h3>
-              <p className="text-gray-700">{documentation.implementationGuide?.testingStrategy}</p>
+              <h3 className="text-lg font-semibold text-white mb-3">Testing Strategy</h3>
+              <p className="text-gray-300">{documentation.implementationGuide?.testingStrategy}</p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Deployment Process</h3>
-              <p className="text-gray-700">{documentation.implementationGuide?.deploymentProcess}</p>
+              <h3 className="text-lg font-semibold text-white mb-3">Deployment Process</h3>
+              <p className="text-gray-300">{documentation.implementationGuide?.deploymentProcess}</p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Maintenance Plan</h3>
-              <p className="text-gray-700">{documentation.implementationGuide?.maintenancePlan}</p>
+              <h3 className="text-lg font-semibold text-white mb-3">Maintenance Plan</h3>
+              <p className="text-gray-300">{documentation.implementationGuide?.maintenancePlan}</p>
             </div>
           </div>
         );
@@ -413,24 +413,24 @@ ${documentation.nextSteps?.successMetrics?.map((metric: string) => `- ${metric}`
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Market Analysis</h3>
-              <p className="text-gray-700">{documentation.businessPlan?.marketAnalysis}</p>
+              <h3 className="text-lg font-semibold text-white mb-3">Market Analysis</h3>
+              <p className="text-gray-300">{documentation.businessPlan?.marketAnalysis}</p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Competitive Analysis</h3>
-              <p className="text-gray-700">{documentation.businessPlan?.competitiveAnalysis}</p>
+              <h3 className="text-lg font-semibold text-white mb-3">Competitive Analysis</h3>
+              <p className="text-gray-300">{documentation.businessPlan?.competitiveAnalysis}</p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Monetization Strategy</h3>
-              <p className="text-gray-700">{documentation.businessPlan?.monetizationStrategy}</p>
+              <h3 className="text-lg font-semibold text-white mb-3">Monetization Strategy</h3>
+              <p className="text-gray-300">{documentation.businessPlan?.monetizationStrategy}</p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Marketing Strategy</h3>
-              <p className="text-gray-700">{documentation.businessPlan?.marketingStrategy}</p>
+              <h3 className="text-lg font-semibold text-white mb-3">Marketing Strategy</h3>
+              <p className="text-gray-300">{documentation.businessPlan?.marketingStrategy}</p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Budget Breakdown</h3>
-              <p className="text-gray-700">{documentation.businessPlan?.budgetBreakdown}</p>
+              <h3 className="text-lg font-semibold text-white mb-3">Budget Breakdown</h3>
+              <p className="text-gray-300">{documentation.businessPlan?.budgetBreakdown}</p>
             </div>
           </div>
         );
@@ -439,40 +439,40 @@ ${documentation.nextSteps?.successMetrics?.map((metric: string) => `- ${metric}`
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Immediate Actions</h3>
+              <h3 className="text-lg font-semibold text-white mb-3">Immediate Actions</h3>
               <ul className="space-y-2">
                 {documentation.nextSteps?.immediateActions?.map((action: string, index: number) => (
                   <li key={index} className="flex items-start">
                     <span className="bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5 flex-shrink-0">
                       !
                     </span>
-                    <span className="text-gray-700">{action}</span>
+                    <span className="text-gray-300">{action}</span>
                   </li>
                 ))}
               </ul>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Short-term Goals</h3>
+              <h3 className="text-lg font-semibold text-white mb-3">Short-term Goals</h3>
               <ul className="space-y-2">
                 {documentation.nextSteps?.shortTermGoals?.map((goal: string, index: number) => (
                   <li key={index} className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-700">{goal}</span>
+                    <CheckCircle className="h-5 w-5 text-blue-400 mr-2 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-300">{goal}</span>
                   </li>
                 ))}
               </ul>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Long-term Vision</h3>
-              <p className="text-gray-700">{documentation.nextSteps?.longTermVision}</p>
+              <h3 className="text-lg font-semibold text-white mb-3">Long-term Vision</h3>
+              <p className="text-gray-300">{documentation.nextSteps?.longTermVision}</p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Success Metrics</h3>
+              <h3 className="text-lg font-semibold text-white mb-3">Success Metrics</h3>
               <ul className="space-y-2">
                 {documentation.nextSteps?.successMetrics?.map((metric: string, index: number) => (
                   <li key={index} className="flex items-start">
-                    <span className="text-green-600 mr-2">📊</span>
-                    <span className="text-gray-700">{metric}</span>
+                    <span className="text-green-400 mr-2">📊</span>
+                    <span className="text-gray-300">{metric}</span>
                   </li>
                 ))}
               </ul>
@@ -491,20 +491,20 @@ ${documentation.nextSteps?.successMetrics?.map((metric: string) => `- ${metric}`
     <>
       {/* Overlay */}
       <div 
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 transition-opacity duration-300"
+        className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 transition-opacity duration-300"
         onClick={onClose}
       />
 
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] flex flex-col">
+        <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] flex flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between p-6 border-b border-slate-700">
             <div className="flex items-center space-x-3">
-              <FileText className="h-6 w-6 text-blue-600" />
+              <FileText className="h-6 w-6 text-blue-400" />
               <div>
-                <h2 className="text-xl font-semibold text-gray-900">Project Documentation</h2>
-                <p className="text-sm text-gray-600">{projectData.name}</p>
+                <h2 className="text-xl font-semibold text-white">Project Documentation</h2>
+                <p className="text-sm text-gray-400">{projectData.name}</p>
               </div>
             </div>
             <div className="flex items-center space-x-2">
@@ -512,10 +512,10 @@ ${documentation.nextSteps?.successMetrics?.map((metric: string) => `- ${metric}`
                 <>
                   <button
                     onClick={() => copyToClipboard(generateMarkdownDoc())}
-                    className="flex items-center px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm"
+                    className="flex items-center px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors text-sm text-gray-300"
                   >
                     {copied ? (
-                      <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
+                      <CheckCircle className="h-4 w-4 mr-2 text-green-400" />
                     ) : (
                       <Copy className="h-4 w-4 mr-2" />
                     )}
@@ -532,9 +532,9 @@ ${documentation.nextSteps?.successMetrics?.map((metric: string) => `- ${metric}`
               )}
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-slate-700 rounded-lg transition-colors text-gray-400 hover:text-white"
               >
-                <X className="h-5 w-5 text-gray-600" />
+                <X className="h-5 w-5" />
               </button>
             </div>
           </div>
@@ -542,7 +542,7 @@ ${documentation.nextSteps?.successMetrics?.map((metric: string) => `- ${metric}`
           {/* Content */}
           <div className="flex flex-1 overflow-hidden">
             {/* Sidebar */}
-            <div className="w-64 bg-gray-50 border-r border-gray-200 p-4">
+            <div className="w-64 bg-slate-700/30 border-r border-slate-700 p-4">
               <nav className="space-y-2">
                 {tabs.map((tab) => (
                   <button
@@ -551,7 +551,7 @@ ${documentation.nextSteps?.successMetrics?.map((metric: string) => `- ${metric}`
                     className={`w-full text-left px-3 py-2 rounded-lg transition-colors text-sm ${
                       activeTab === tab.id
                         ? 'bg-blue-600 text-white'
-                        : 'text-gray-700 hover:bg-gray-200'
+                        : 'text-gray-300 hover:bg-slate-600'
                     }`}
                   >
                     <div className="flex items-center">
@@ -568,8 +568,8 @@ ${documentation.nextSteps?.successMetrics?.map((metric: string) => `- ${metric}`
               {isLoading ? (
                 <div className="flex items-center justify-center h-64">
                   <div className="text-center">
-                    <RefreshCw className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-4" />
-                    <p className="text-gray-600">Generating comprehensive documentation...</p>
+                    <RefreshCw className="h-8 w-8 animate-spin text-blue-400 mx-auto mb-4" />
+                    <p className="text-gray-400">Generating comprehensive documentation...</p>
                   </div>
                 </div>
               ) : documentation ? (
@@ -577,8 +577,8 @@ ${documentation.nextSteps?.successMetrics?.map((metric: string) => `- ${metric}`
               ) : (
                 <div className="flex items-center justify-center h-64">
                   <div className="text-center">
-                    <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600">Failed to generate documentation. Please try again.</p>
+                    <FileText className="h-12 w-12 text-gray-500 mx-auto mb-4" />
+                    <p className="text-gray-400">Failed to generate documentation. Please try again.</p>
                     <button
                       onClick={generateDocumentation}
                       className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"

@@ -16,11 +16,11 @@ const Logo: React.FC<LogoProps> = ({
   const getTextClasses = () => {
     switch (textSize) {
       case 'sm':
-        return 'text-lg font-bold text-gray-900';
+        return 'text-lg font-bold text-white';
       case 'lg':
         return 'text-3xl font-bold text-white';
       default:
-        return 'text-xl font-bold text-gray-900';
+        return 'text-xl font-bold text-white';
     }
   };
 

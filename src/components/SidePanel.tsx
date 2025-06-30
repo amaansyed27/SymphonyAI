@@ -47,7 +47,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
       case 'deployment':
         return <DeploymentSection projectData={projectData} onUpdate={onUpdateProject} apiKey={apiKey} />;
       default:
-        return <div className="text-gray-600">Section coming soon...</div>;
+        return <div className="text-gray-400">Section coming soon...</div>;
     }
   };
 
@@ -80,7 +80,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
       {/* Overlay */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300"
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 transition-opacity duration-300"
           onClick={onClose}
         />
       )}
@@ -88,8 +88,8 @@ const SidePanel: React.FC<SidePanelProps> = ({
       {/* Panel */}
       <div
         className={`
-          fixed top-0 right-0 h-full w-full max-w-2xl bg-white shadow-2xl z-50
-          transform transition-transform duration-300 ease-in-out
+          fixed top-0 right-0 h-full w-full max-w-2xl bg-slate-800 shadow-2xl z-50
+          transform transition-transform duration-300 ease-in-out border-l border-slate-700
           ${isOpen ? 'translate-x-0' : 'translate-x-full'}
           overflow-y-auto
         `}
@@ -97,25 +97,25 @@ const SidePanel: React.FC<SidePanelProps> = ({
         {currentStage && (
           <>
             {/* Header */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 z-10">
+            <div className="sticky top-0 bg-slate-800 border-b border-slate-700 p-6 z-10">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <div className="flex items-center space-x-3">
-                    <h2 className="text-2xl font-bold text-gray-900">{currentStage.title}</h2>
+                    <h2 className="text-2xl font-bold text-white">{currentStage.title}</h2>
                     {currentStage.status === 'completed' && (
-                      <CheckCircle className="h-6 w-6 text-green-600" />
+                      <CheckCircle className="h-6 w-6 text-green-400" />
                     )}
                   </div>
-                  <p className="text-gray-600 mt-1">{currentStage.description}</p>
+                  <p className="text-gray-400 mt-1">{currentStage.description}</p>
                   
                   {/* Stage Status */}
                   <div className="mt-3 flex items-center space-x-4">
                     <div className={`px-3 py-1 rounded-full text-sm font-medium ${
                       currentStage.status === 'completed' 
-                        ? 'bg-green-100 text-green-800'
+                        ? 'bg-green-500/20 text-green-300'
                         : isStageCompleted
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-gray-100 text-gray-800'
+                        ? 'bg-blue-500/20 text-blue-300'
+                        : 'bg-gray-500/20 text-gray-400'
                     }`}>
                       {currentStage.status === 'completed' 
                         ? 'Completed' 
@@ -139,9 +139,9 @@ const SidePanel: React.FC<SidePanelProps> = ({
                 
                 <button
                   onClick={onClose}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors ml-4"
+                  className="p-2 hover:bg-slate-700 rounded-lg transition-colors ml-4 text-gray-400 hover:text-white"
                 >
-                  <X className="h-6 w-6 text-gray-600" />
+                  <X className="h-6 w-6" />
                 </button>
               </div>
             </div>
@@ -150,9 +150,9 @@ const SidePanel: React.FC<SidePanelProps> = ({
             <div className="p-6">
               {/* Completion Requirements */}
               {!isStageCompleted && (
-                <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <h3 className="font-medium text-blue-900 mb-2">To complete this stage:</h3>
-                  <ul className="text-sm text-blue-800 space-y-1">
+                <div className="mb-6 p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                  <h3 className="font-medium text-blue-300 mb-2">To complete this stage:</h3>
+                  <ul className="text-sm text-blue-200 space-y-1">
                     {currentStage.id === 'name-logo' && (
                       <>
                         <li>• Choose a project name</li>
@@ -182,7 +182,9 @@ const SidePanel: React.FC<SidePanelProps> = ({
                 </div>
               )}
 
-              {renderSectionContent()}
+              <div className="text-gray-300">
+                {renderSectionContent()}
+              </div>
             </div>
           </>
         )}
