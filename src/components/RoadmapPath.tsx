@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RoadmapStage } from '../types';
 import { 
@@ -23,11 +23,14 @@ interface RoadmapPathProps {
 const RoadmapPath: React.FC<RoadmapPathProps> = ({ stages, onStageClick }) => {
   const [hoveredStage, setHoveredStage] = useState<string | null>(null);
   const [particles, setParticles] = useState<Array<{id: number, x: number, y: number}>>([]);
+  const [tooltipPosition, setTooltipPosition] = useState<{x: number, y: number} | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
 
   // Generate floating particles
   useEffect(() => {
     const generateParticles = () => {
-      const newParticles = Array.from({ length: 15 }, (_, i) => ({
+      const newParticles = Array.from({ length: 12 }, (_, i) => ({
         id: i,
         x: Math.random() * 100,
         y: Math.random() * 100
@@ -36,9 +39,52 @@ const RoadmapPath: React.FC<RoadmapPathProps> = ({ stages, onStageClick }) => {
     };
 
     generateParticles();
-    const interval = setInterval(generateParticles, 10000);
+    const interval = setInterval(generateParticles, 8000);
     return () => clearInterval(interval);
   }, []);
+
+  // Calculate tooltip position to keep it in bounds
+  const calculateTooltipPosition = (stagePosition: {x: number, y: number}) => {
+    if (!containerRef.current || !tooltipRef.current) return { x: 50, y: 50 };
+
+    const container = containerRef.current.getBoundingClientRect();
+    const tooltip = tooltipRef.current.getBoundingClientRect();
+    
+    // Convert percentage to pixels
+    const stageX = (stagePosition.x / 100) * container.width;
+    const stageY = (stagePosition.y / 100) * container.height;
+    
+    // Calculate initial position (below the stage)
+    let tooltipX = stageX - tooltip.width / 2;
+    let tooltipY = stageY + 60; // 60px below the stage
+    
+    // Adjust horizontal position if tooltip goes out of bounds
+    if (tooltipX < 10) {
+      tooltipX = 10;
+    } else if (tooltipX + tooltip.width > container.width - 10) {
+      tooltipX = container.width - tooltip.width - 10;
+    }
+    
+    // Adjust vertical position if tooltip goes out of bounds
+    if (tooltipY + tooltip.height > container.height - 10) {
+      tooltipY = stageY - tooltip.height - 20; // Show above the stage
+    }
+    
+    // Convert back to percentages
+    return {
+      x: (tooltipX / container.width) * 100,
+      y: (tooltipY / container.height) * 100
+    };
+  };
+
+  const handleStageHover = (stage: RoadmapStage) => {
+    setHoveredStage(stage.id);
+    // Small delay to ensure tooltip is rendered before calculating position
+    setTimeout(() => {
+      const position = calculateTooltipPosition(stage.position);
+      setTooltipPosition(position);
+    }, 10);
+  };
 
   const getIcon = (iconName: string) => {
     const icons = {
@@ -73,28 +119,32 @@ const RoadmapPath: React.FC<RoadmapPathProps> = ({ stages, onStageClick }) => {
           gradient: 'from-green-500 via-emerald-500 to-green-600',
           border: 'border-green-400',
           glow: 'shadow-green-500/50',
-          text: 'text-white'
+          text: 'text-white',
+          bgGlow: 'bg-green-500/20'
         };
       case 'available':
         return {
           gradient: 'from-blue-500 via-purple-500 to-pink-500',
           border: 'border-blue-400',
           glow: 'shadow-blue-500/50',
-          text: 'text-white'
+          text: 'text-white',
+          bgGlow: 'bg-blue-500/20'
         };
       case 'locked':
         return {
           gradient: 'from-gray-600 to-gray-700',
           border: 'border-gray-500',
           glow: 'shadow-gray-500/20',
-          text: 'text-gray-300'
+          text: 'text-gray-300',
+          bgGlow: 'bg-gray-500/10'
         };
       default:
         return {
           gradient: 'from-gray-600 to-gray-700',
           border: 'border-gray-500',
           glow: 'shadow-gray-500/20',
-          text: 'text-gray-300'
+          text: 'text-gray-300',
+          bgGlow: 'bg-gray-500/10'
         };
     }
   };
@@ -105,14 +155,16 @@ const RoadmapPath: React.FC<RoadmapPathProps> = ({ stages, onStageClick }) => {
     return 0.2;
   };
 
+  const hoveredStageData = stages.find(stage => stage.id === hoveredStage);
+
   return (
-    <div className="relative w-full h-full p-8 overflow-hidden">
+    <div ref={containerRef} className="relative w-full h-full p-8 overflow-hidden">
       {/* Animated Background Particles */}
       <div className="absolute inset-0 pointer-events-none">
         {particles.map((particle) => (
           <motion.div
             key={particle.id}
-            className="absolute w-1 h-1 bg-blue-400/30 rounded-full"
+            className="absolute w-1 h-1 bg-blue-400/20 rounded-full"
             initial={{ 
               x: `${particle.x}%`, 
               y: `${particle.y}%`,
@@ -120,13 +172,13 @@ const RoadmapPath: React.FC<RoadmapPathProps> = ({ stages, onStageClick }) => {
               opacity: 0
             }}
             animate={{ 
-              x: `${(particle.x + 20) % 100}%`,
-              y: `${(particle.y + 15) % 100}%`,
+              x: `${(particle.x + 25) % 100}%`,
+              y: `${(particle.y + 20) % 100}%`,
               scale: [0, 1, 0],
-              opacity: [0, 0.6, 0]
+              opacity: [0, 0.4, 0]
             }}
             transition={{ 
-              duration: 8,
+              duration: 10,
               repeat: Infinity,
               ease: "linear"
             }}
@@ -201,8 +253,11 @@ const RoadmapPath: React.FC<RoadmapPathProps> = ({ stages, onStageClick }) => {
               type: "spring",
               stiffness: 100
             }}
-            onMouseEnter={() => setHoveredStage(stage.id)}
-            onMouseLeave={() => setHoveredStage(null)}
+            onMouseEnter={() => handleStageHover(stage)}
+            onMouseLeave={() => {
+              setHoveredStage(null);
+              setTooltipPosition(null);
+            }}
             onClick={() => stage.status !== 'locked' && onStageClick(stage)}
           >
             <div
@@ -212,88 +267,105 @@ const RoadmapPath: React.FC<RoadmapPathProps> = ({ stages, onStageClick }) => {
                 transition-all duration-300
               `}
             >
-              {/* Glow Effect */}
+              {/* Enhanced Glow Effect */}
               <motion.div
-                className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${colors.gradient} opacity-20 blur-xl`}
+                className={`absolute inset-0 rounded-2xl ${colors.bgGlow} blur-xl`}
                 animate={{
-                  scale: isHovered ? 1.2 : 1,
-                  opacity: isHovered ? 0.4 : 0.2
+                  scale: isHovered ? 1.4 : 1,
+                  opacity: isHovered ? 0.6 : stage.status === 'available' ? 0.3 : 0.1
                 }}
                 transition={{ duration: 0.3 }}
               />
 
-              {/* Main Card */}
+              {/* Main Card with Enhanced Design */}
               <motion.div
                 className={`
-                  relative w-24 h-24 rounded-2xl border-2 ${colors.border}
+                  relative w-28 h-28 rounded-2xl border-2 ${colors.border}
                   bg-gradient-to-br ${colors.gradient} ${colors.text}
-                  flex items-center justify-center shadow-xl ${colors.glow}
-                  transition-all duration-300
+                  flex items-center justify-center shadow-2xl ${colors.glow}
+                  transition-all duration-300 backdrop-blur-sm
                 `}
                 whileHover={{ 
                   scale: stage.status !== 'locked' ? 1.1 : 1,
-                  rotate: stage.status !== 'locked' ? [0, -2, 2, 0] : 0
+                  rotate: stage.status !== 'locked' ? [0, -1, 1, 0] : 0
                 }}
                 whileTap={{ scale: stage.status !== 'locked' ? 0.95 : 1 }}
                 animate={{
                   boxShadow: stage.status === 'available' && isHovered 
-                    ? '0 0 30px rgba(59, 130, 246, 0.6)' 
+                    ? '0 0 40px rgba(59, 130, 246, 0.8)' 
                     : stage.status === 'completed'
-                    ? '0 0 20px rgba(16, 185, 129, 0.4)'
-                    : '0 10px 25px rgba(0, 0, 0, 0.3)'
+                    ? '0 0 25px rgba(16, 185, 129, 0.5)'
+                    : '0 15px 35px rgba(0, 0, 0, 0.4)'
                 }}
               >
-                {/* Animated Background Pattern */}
+                {/* Animated Background Pattern for Available Stages */}
                 {stage.status === 'available' && (
                   <motion.div
                     className="absolute inset-0 rounded-2xl"
                     style={{
-                      background: 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1) 0%, transparent 70%)'
+                      background: 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.15) 0%, transparent 70%)'
                     }}
                     animate={{
-                      scale: [1, 1.2, 1],
-                      opacity: [0.3, 0.6, 0.3]
+                      scale: [1, 1.3, 1],
+                      opacity: [0.2, 0.5, 0.2]
                     }}
                     transition={{
-                      duration: 2,
+                      duration: 2.5,
                       repeat: Infinity,
                       ease: "easeInOut"
                     }}
                   />
                 )}
 
-                {/* Icon */}
+                {/* Icon with Enhanced Animation */}
                 <motion.div
                   animate={{
-                    rotate: stage.status === 'available' && isHovered ? 360 : 0
+                    rotate: stage.status === 'available' && isHovered ? 360 : 0,
+                    scale: isHovered ? 1.1 : 1
                   }}
                   transition={{ duration: 0.6 }}
+                  className="relative z-10"
                 >
                   {getIcon(stage.icon)}
                 </motion.div>
 
-                {/* Pulse Effect for Available Stages */}
+                {/* Enhanced Pulse Effect for Available Stages */}
                 {stage.status === 'available' && (
-                  <motion.div
-                    className="absolute inset-0 rounded-2xl border-2 border-blue-400"
-                    animate={{
-                      scale: [1, 1.2, 1],
-                      opacity: [0.5, 0, 0.5]
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }}
-                  />
+                  <>
+                    <motion.div
+                      className="absolute inset-0 rounded-2xl border-2 border-blue-400"
+                      animate={{
+                        scale: [1, 1.3, 1],
+                        opacity: [0.6, 0, 0.6]
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    />
+                    <motion.div
+                      className="absolute inset-0 rounded-2xl border border-purple-400"
+                      animate={{
+                        scale: [1, 1.5, 1],
+                        opacity: [0.4, 0, 0.4]
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                        delay: 0.5
+                      }}
+                    />
+                  </>
                 )}
               </motion.div>
 
-              {/* Status Badge */}
+              {/* Enhanced Status Badge */}
               <AnimatePresence>
                 {getStatusIcon(stage.status) && (
                   <motion.div
-                    className="absolute -top-2 -right-2 bg-slate-800 rounded-full p-1 shadow-lg border border-slate-600"
+                    className="absolute -top-2 -right-2 bg-slate-800 rounded-full p-1.5 shadow-xl border border-slate-600"
                     initial={{ scale: 0, rotate: -180 }}
                     animate={{ scale: 1, rotate: 0 }}
                     exit={{ scale: 0, rotate: 180 }}
@@ -304,53 +376,16 @@ const RoadmapPath: React.FC<RoadmapPathProps> = ({ stages, onStageClick }) => {
                 )}
               </AnimatePresence>
 
-              {/* Stage Number */}
+              {/* Enhanced Stage Number */}
               <motion.div
-                className="absolute -top-3 -left-3 w-8 h-8 bg-slate-800 border border-slate-600 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-lg"
+                className="absolute -top-3 -left-3 w-9 h-9 bg-slate-800 border-2 border-slate-600 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-xl"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: index * 0.1 + 0.3 }}
-                whileHover={{ scale: 1.1 }}
+                whileHover={{ scale: 1.15 }}
               >
                 {index + 1}
               </motion.div>
-
-              {/* Enhanced Tooltip */}
-              <AnimatePresence>
-                {isHovered && (
-                  <motion.div
-                    className="absolute top-full mt-4 left-1/2 transform -translate-x-1/2 pointer-events-none z-10"
-                    initial={{ opacity: 0, y: -10, scale: 0.8 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -10, scale: 0.8 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <div className="bg-slate-800 border border-slate-600 text-white px-4 py-3 rounded-xl shadow-2xl max-w-xs">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <h3 className="font-semibold text-sm">{stage.title}</h3>
-                        {stage.status === 'available' && (
-                          <Zap className="h-4 w-4 text-yellow-400" />
-                        )}
-                      </div>
-                      <p className="text-xs text-gray-300 leading-relaxed">{stage.description}</p>
-                      <div className="mt-2">
-                        <span className={`inline-block px-2 py-1 text-xs rounded-full ${
-                          stage.status === 'completed' 
-                            ? 'bg-green-500/20 text-green-300'
-                            : stage.status === 'available'
-                            ? 'bg-blue-500/20 text-blue-300'
-                            : 'bg-gray-500/20 text-gray-400'
-                        }`}>
-                          {stage.status === 'completed' ? 'Completed' : 
-                           stage.status === 'available' ? 'Click to start' : 'Locked'}
-                        </span>
-                      </div>
-                    </div>
-                    {/* Tooltip Arrow */}
-                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-slate-800 border-l border-t border-slate-600 rotate-45"></div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
 
               {/* Click Ripple Effect */}
               {stage.status !== 'locked' && (
@@ -358,7 +393,7 @@ const RoadmapPath: React.FC<RoadmapPathProps> = ({ stages, onStageClick }) => {
                   className="absolute inset-0 rounded-2xl pointer-events-none"
                   initial={false}
                   whileTap={{
-                    background: "radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%)"
+                    background: "radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%)"
                   }}
                 />
               )}
@@ -366,6 +401,68 @@ const RoadmapPath: React.FC<RoadmapPathProps> = ({ stages, onStageClick }) => {
           </motion.div>
         );
       })}
+
+      {/* Enhanced Tooltip with Smart Positioning */}
+      <AnimatePresence>
+        {hoveredStage && hoveredStageData && tooltipPosition && (
+          <motion.div
+            ref={tooltipRef}
+            className="absolute pointer-events-none z-20"
+            style={{
+              left: `${tooltipPosition.x}%`,
+              top: `${tooltipPosition.y}%`
+            }}
+            initial={{ opacity: 0, y: -10, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.8 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="bg-slate-800/95 backdrop-blur-lg border border-slate-600 text-white px-5 py-4 rounded-xl shadow-2xl max-w-xs">
+              <div className="flex items-center space-x-3 mb-3">
+                <div className={`p-2 rounded-lg ${getStageColors(hoveredStageData.status).bgGlow}`}>
+                  {getIcon(hoveredStageData.icon)}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-sm text-white">{hoveredStageData.title}</h3>
+                  {hoveredStageData.status === 'available' && (
+                    <div className="flex items-center space-x-1 mt-1">
+                      <Zap className="h-3 w-3 text-yellow-400" />
+                      <span className="text-xs text-yellow-300">Ready to start</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <p className="text-xs text-gray-300 leading-relaxed mb-3">
+                {hoveredStageData.description}
+              </p>
+              
+              <div className="flex items-center justify-between">
+                <span className={`inline-block px-3 py-1 text-xs rounded-full font-medium ${
+                  hoveredStageData.status === 'completed' 
+                    ? 'bg-green-500/20 text-green-300 border border-green-500/30'
+                    : hoveredStageData.status === 'available'
+                    ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                    : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+                }`}>
+                  {hoveredStageData.status === 'completed' ? '✓ Completed' : 
+                   hoveredStageData.status === 'available' ? '→ Click to start' : '🔒 Locked'}
+                </span>
+                
+                {hoveredStageData.status === 'available' && (
+                  <motion.div
+                    animate={{ x: [0, 3, 0] }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                    className="text-blue-400"
+                  >
+                    →
+                  </motion.div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
