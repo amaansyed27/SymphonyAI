@@ -99,33 +99,33 @@ const DeploymentSection: React.FC<DeploymentSectionProps> = ({
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600 bg-green-100';
-    if (score >= 60) return 'text-yellow-600 bg-yellow-100';
-    return 'text-red-600 bg-red-100';
+    if (score >= 80) return 'text-green-300 bg-green-500/20';
+    if (score >= 60) return 'text-yellow-300 bg-yellow-500/20';
+    return 'text-red-300 bg-red-500/20';
   };
 
   return (
     <div className="space-y-8">
       {/* Current Selection */}
       {projectData.deployment && (
-        <div className="bg-green-50 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <Rocket className="h-5 w-5 text-green-600 mr-2" />
+        <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+            <Rocket className="h-5 w-5 text-green-400 mr-2" />
             Selected Deployment Platform
           </h3>
           <div className="space-y-3">
             <div>
-              <span className="font-medium text-gray-700">Platform:</span>
-              <span className="ml-2 text-gray-900">{projectData.deployment.platform}</span>
+              <span className="font-medium text-gray-300">Platform:</span>
+              <span className="ml-2 text-white">{projectData.deployment.platform}</span>
             </div>
             <div>
-              <span className="font-medium text-gray-700">Reasoning:</span>
-              <p className="text-gray-600 mt-1">{projectData.deployment.reasoning}</p>
+              <span className="font-medium text-gray-300">Reasoning:</span>
+              <p className="text-gray-400 mt-1">{projectData.deployment.reasoning}</p>
             </div>
             {projectData.deployment.steps && (
               <div>
-                <span className="font-medium text-gray-700">Setup Steps:</span>
-                <ol className="list-decimal list-inside mt-2 space-y-1 text-sm text-gray-600">
+                <span className="font-medium text-gray-300">Setup Steps:</span>
+                <ol className="list-decimal list-inside mt-2 space-y-1 text-sm text-gray-400">
                   {projectData.deployment.steps.map((step: string, index: number) => (
                     <li key={index}>{step}</li>
                   ))}
@@ -138,7 +138,7 @@ const DeploymentSection: React.FC<DeploymentSectionProps> = ({
 
       {/* Generate Recommendations */}
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900">Deployment Recommendations</h3>
+        <h3 className="text-lg font-semibold text-white">Deployment Recommendations</h3>
         <button
           onClick={generateRecommendations}
           disabled={isLoading || !apiKey}
@@ -154,8 +154,8 @@ const DeploymentSection: React.FC<DeploymentSectionProps> = ({
       </div>
 
       {!apiKey && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-          <p className="text-amber-800 text-sm">
+        <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
+          <p className="text-amber-200 text-sm">
             Please add your Gemini API key to get deployment recommendations and expert advice.
           </p>
         </div>
@@ -164,13 +164,13 @@ const DeploymentSection: React.FC<DeploymentSectionProps> = ({
       {/* Platform Recommendations */}
       {recommendations && (
         <div className="space-y-4">
-          <h4 className="font-medium text-gray-900">Recommended Platforms</h4>
+          <h4 className="font-medium text-white">Recommended Platforms</h4>
           {recommendations.recommendations?.map((platform: any, index: number) => (
-            <div key={index} className="border border-gray-200 rounded-lg p-6 hover:border-blue-300 transition-colors">
+            <div key={index} className="border border-slate-600 rounded-lg p-6 hover:border-blue-400 transition-colors bg-slate-700/20">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-3">
-                  <h5 className="text-lg font-semibold text-gray-900">{platform.name}</h5>
-                  <span className="bg-gray-100 text-gray-700 px-2 py-1 text-xs rounded">
+                  <h5 className="text-lg font-semibold text-white">{platform.name}</h5>
+                  <span className="bg-slate-600/50 text-gray-300 px-2 py-1 text-xs rounded">
                     {platform.type}
                   </span>
                   <span className={`px-2 py-1 text-xs rounded font-medium ${getScoreColor(platform.score)}`}>
@@ -183,7 +183,7 @@ const DeploymentSection: React.FC<DeploymentSectionProps> = ({
                       href={platform.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-2 text-gray-600 hover:text-blue-600 transition-colors"
+                      className="p-2 text-gray-400 hover:text-blue-400 transition-colors"
                     >
                       <ExternalLink className="h-4 w-4" />
                     </a>
@@ -199,22 +199,22 @@ const DeploymentSection: React.FC<DeploymentSectionProps> = ({
 
               <div className="grid md:grid-cols-2 gap-6 mb-4">
                 <div>
-                  <h6 className="font-medium text-green-700 mb-2">Advantages</h6>
+                  <h6 className="font-medium text-green-400 mb-2">Advantages</h6>
                   <ul className="space-y-1">
                     {platform.pros?.map((pro: string, i: number) => (
-                      <li key={i} className="text-sm text-gray-600 flex items-start">
-                        <span className="text-green-500 mr-2">✓</span>
+                      <li key={i} className="text-sm text-gray-300 flex items-start">
+                        <span className="text-green-400 mr-2">✓</span>
                         {pro}
                       </li>
                     ))}
                   </ul>
                 </div>
                 <div>
-                  <h6 className="font-medium text-red-700 mb-2">Considerations</h6>
+                  <h6 className="font-medium text-red-400 mb-2">Considerations</h6>
                   <ul className="space-y-1">
                     {platform.cons?.map((con: string, i: number) => (
-                      <li key={i} className="text-sm text-gray-600 flex items-start">
-                        <span className="text-red-500 mr-2">!</span>
+                      <li key={i} className="text-sm text-gray-300 flex items-start">
+                        <span className="text-red-400 mr-2">!</span>
                         {con}
                       </li>
                     ))}
@@ -222,18 +222,18 @@ const DeploymentSection: React.FC<DeploymentSectionProps> = ({
                 </div>
               </div>
 
-              <div className="bg-blue-50 rounded-lg p-4 mb-4">
-                <p className="text-sm text-blue-800">
+              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mb-4">
+                <p className="text-sm text-blue-200">
                   <strong>Best for:</strong> {platform.bestFor}
                 </p>
-                <p className="text-sm text-blue-700 mt-1">
+                <p className="text-sm text-blue-300 mt-1">
                   <strong>Pricing:</strong> {platform.pricing}
                 </p>
               </div>
 
               <div>
-                <h6 className="font-medium text-gray-700 mb-2">Setup Process</h6>
-                <ol className="list-decimal list-inside space-y-1 text-sm text-gray-600">
+                <h6 className="font-medium text-gray-300 mb-2">Setup Process</h6>
+                <ol className="list-decimal list-inside space-y-1 text-sm text-gray-400">
                   {platform.setup?.map((step: string, i: number) => (
                     <li key={i}>{step}</li>
                   ))}
@@ -245,16 +245,16 @@ const DeploymentSection: React.FC<DeploymentSectionProps> = ({
       )}
 
       {/* Deployment Expert Chat */}
-      <div className="border border-gray-200 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <MessageCircle className="h-5 w-5 text-blue-600 mr-2" />
+      <div className="border border-slate-600 rounded-xl p-6 bg-slate-700/20">
+        <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+          <MessageCircle className="h-5 w-5 text-blue-400 mr-2" />
           Deployment Expert Chat
         </h3>
 
         {/* Chat History */}
-        <div className="bg-gray-50 rounded-lg p-4 max-h-64 overflow-y-auto mb-4">
+        <div className="bg-slate-600/30 rounded-lg p-4 max-h-64 overflow-y-auto mb-4">
           {chatHistory.length === 0 ? (
-            <p className="text-gray-500 text-sm">
+            <p className="text-gray-400 text-sm">
               Ask me about deployment strategies, platform comparisons, pricing, or setup help. 
               For example: "What's the difference between Vercel and Netlify?" or "How much will it cost to deploy my app?"
             </p>
@@ -265,8 +265,8 @@ const DeploymentSection: React.FC<DeploymentSectionProps> = ({
                   key={index}
                   className={`p-3 rounded-lg ${
                     message.role === 'user'
-                      ? 'bg-blue-100 text-blue-900 ml-8'
-                      : 'bg-white text-gray-900 mr-8'
+                      ? 'bg-blue-500/20 text-blue-100 ml-8'
+                      : 'bg-slate-700/50 text-gray-200 mr-8'
                   }`}
                 >
                   <p className="text-sm whitespace-pre-wrap">{message.content}</p>
@@ -284,7 +284,7 @@ const DeploymentSection: React.FC<DeploymentSectionProps> = ({
             onChange={(e) => setChatMessage(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleChatSubmit()}
             placeholder="Ask about deployment options..."
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="flex-1 px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-gray-400"
             disabled={!apiKey}
           />
           <button

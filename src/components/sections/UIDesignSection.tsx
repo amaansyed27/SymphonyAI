@@ -86,50 +86,50 @@ const UIDesignSection: React.FC<UIDesignSectionProps> = ({
     <div className="space-y-8">
       {/* Current Selection */}
       {projectData.uiStyle && (
-        <div className="bg-blue-50 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Current Design</h3>
+        <div className="bg-slate-700/30 rounded-xl p-6 border border-slate-600">
+          <h3 className="text-lg font-semibold text-white mb-4">Current Design</h3>
           
           {projectData.uiStyle.selectedPalette && (
             <div className="mb-6">
-              <h4 className="font-medium text-gray-700 mb-3">Color Palette: {projectData.uiStyle.selectedPalette.name}</h4>
+              <h4 className="font-medium text-gray-300 mb-3">Color Palette: {projectData.uiStyle.selectedPalette.name}</h4>
               <div className="flex space-x-2 mb-2">
                 <div 
-                  className="w-12 h-12 rounded-lg border border-gray-200 shadow-sm"
+                  className="w-12 h-12 rounded-lg border border-slate-500 shadow-sm"
                   style={{ backgroundColor: projectData.uiStyle.selectedPalette.primary }}
                   title="Primary"
                 />
                 <div 
-                  className="w-12 h-12 rounded-lg border border-gray-200 shadow-sm"
+                  className="w-12 h-12 rounded-lg border border-slate-500 shadow-sm"
                   style={{ backgroundColor: projectData.uiStyle.selectedPalette.secondary }}
                   title="Secondary"
                 />
                 <div 
-                  className="w-12 h-12 rounded-lg border border-gray-200 shadow-sm"
+                  className="w-12 h-12 rounded-lg border border-slate-500 shadow-sm"
                   style={{ backgroundColor: projectData.uiStyle.selectedPalette.accent }}
                   title="Accent"
                 />
                 <div 
-                  className="w-12 h-12 rounded-lg border border-gray-200 shadow-sm"
+                  className="w-12 h-12 rounded-lg border border-slate-500 shadow-sm"
                   style={{ backgroundColor: projectData.uiStyle.selectedPalette.background }}
                   title="Background"
                 />
                 <div 
-                  className="w-12 h-12 rounded-lg border border-gray-200 shadow-sm"
+                  className="w-12 h-12 rounded-lg border border-slate-500 shadow-sm"
                   style={{ backgroundColor: projectData.uiStyle.selectedPalette.text }}
                   title="Text"
                 />
               </div>
-              <p className="text-sm text-gray-600">{projectData.uiStyle.selectedPalette.description}</p>
+              <p className="text-sm text-gray-400">{projectData.uiStyle.selectedPalette.description}</p>
             </div>
           )}
 
           {projectData.uiStyle.selectedStyle && (
             <div>
-              <h4 className="font-medium text-gray-700 mb-2">Design Style: {projectData.uiStyle.selectedStyle.name}</h4>
-              <p className="text-sm text-gray-600 mb-2">{projectData.uiStyle.selectedStyle.description}</p>
+              <h4 className="font-medium text-gray-300 mb-2">Design Style: {projectData.uiStyle.selectedStyle.name}</h4>
+              <p className="text-sm text-gray-400 mb-2">{projectData.uiStyle.selectedStyle.description}</p>
               <div className="flex flex-wrap gap-2">
                 {projectData.uiStyle.selectedStyle.characteristics?.map((char: string, index: number) => (
-                  <span key={index} className="bg-blue-100 text-blue-800 px-2 py-1 text-xs rounded">
+                  <span key={index} className="bg-blue-500/20 text-blue-300 px-2 py-1 text-xs rounded">
                     {char}
                   </span>
                 ))}
@@ -141,7 +141,7 @@ const UIDesignSection: React.FC<UIDesignSectionProps> = ({
 
       {/* Generate Design Suggestions */}
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900">Design Suggestions</h3>
+        <h3 className="text-lg font-semibold text-white">Design Suggestions</h3>
         <button
           onClick={generateDesignSuggestions}
           disabled={isLoading || !apiKey}
@@ -157,8 +157,8 @@ const UIDesignSection: React.FC<UIDesignSectionProps> = ({
       </div>
 
       {!apiKey && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-          <p className="text-amber-800 text-sm">
+        <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
+          <p className="text-amber-200 text-sm">
             Please add your Gemini API key to generate design suggestions.
           </p>
         </div>
@@ -168,18 +168,18 @@ const UIDesignSection: React.FC<UIDesignSectionProps> = ({
         <div className="space-y-8">
           {/* Color Palettes */}
           <div>
-            <h4 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-              <Palette className="h-5 w-5 text-purple-600 mr-2" />
+            <h4 className="text-lg font-medium text-white mb-4 flex items-center">
+              <Palette className="h-5 w-5 text-purple-400 mr-2" />
               Color Palettes
             </h4>
             <div className="grid gap-4">
               {designSuggestions.colorPalettes?.map((palette: any, index: number) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition-colors">
+                <div key={index} className="border border-slate-600 rounded-lg p-4 hover:border-purple-400 transition-colors bg-slate-700/20">
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <h5 className="font-medium text-gray-900">{palette.name}</h5>
-                      <p className="text-sm text-gray-600">{palette.description}</p>
-                      <span className="inline-block bg-purple-100 text-purple-800 px-2 py-1 text-xs rounded mt-1">
+                      <h5 className="font-medium text-white">{palette.name}</h5>
+                      <p className="text-sm text-gray-400">{palette.description}</p>
+                      <span className="inline-block bg-purple-500/20 text-purple-300 px-2 py-1 text-xs rounded mt-1">
                         {palette.mood}
                       </span>
                     </div>
@@ -193,38 +193,38 @@ const UIDesignSection: React.FC<UIDesignSectionProps> = ({
                   <div className="flex space-x-2">
                     <div className="text-center">
                       <div 
-                        className="w-12 h-12 rounded-lg border border-gray-200 shadow-sm mb-1"
+                        className="w-12 h-12 rounded-lg border border-slate-500 shadow-sm mb-1"
                         style={{ backgroundColor: palette.primary }}
                       />
-                      <span className="text-xs text-gray-500">Primary</span>
+                      <span className="text-xs text-gray-400">Primary</span>
                     </div>
                     <div className="text-center">
                       <div 
-                        className="w-12 h-12 rounded-lg border border-gray-200 shadow-sm mb-1"
+                        className="w-12 h-12 rounded-lg border border-slate-500 shadow-sm mb-1"
                         style={{ backgroundColor: palette.secondary }}
                       />
-                      <span className="text-xs text-gray-500">Secondary</span>
+                      <span className="text-xs text-gray-400">Secondary</span>
                     </div>
                     <div className="text-center">
                       <div 
-                        className="w-12 h-12 rounded-lg border border-gray-200 shadow-sm mb-1"
+                        className="w-12 h-12 rounded-lg border border-slate-500 shadow-sm mb-1"
                         style={{ backgroundColor: palette.accent }}
                       />
-                      <span className="text-xs text-gray-500">Accent</span>
+                      <span className="text-xs text-gray-400">Accent</span>
                     </div>
                     <div className="text-center">
                       <div 
-                        className="w-12 h-12 rounded-lg border border-gray-200 shadow-sm mb-1"
+                        className="w-12 h-12 rounded-lg border border-slate-500 shadow-sm mb-1"
                         style={{ backgroundColor: palette.background }}
                       />
-                      <span className="text-xs text-gray-500">Background</span>
+                      <span className="text-xs text-gray-400">Background</span>
                     </div>
                     <div className="text-center">
                       <div 
-                        className="w-12 h-12 rounded-lg border border-gray-200 shadow-sm mb-1"
+                        className="w-12 h-12 rounded-lg border border-slate-500 shadow-sm mb-1"
                         style={{ backgroundColor: palette.text }}
                       />
-                      <span className="text-xs text-gray-500">Text</span>
+                      <span className="text-xs text-gray-400">Text</span>
                     </div>
                   </div>
                 </div>
@@ -234,25 +234,25 @@ const UIDesignSection: React.FC<UIDesignSectionProps> = ({
 
           {/* Design Styles */}
           <div>
-            <h4 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-              <Eye className="h-5 w-5 text-blue-600 mr-2" />
+            <h4 className="text-lg font-medium text-white mb-4 flex items-center">
+              <Eye className="h-5 w-5 text-blue-400 mr-2" />
               Design Styles
             </h4>
             <div className="grid gap-4">
               {designSuggestions.designStyles?.map((style: any, index: number) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
+                <div key={index} className="border border-slate-600 rounded-lg p-4 hover:border-blue-400 transition-colors bg-slate-700/20">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
-                      <h5 className="font-medium text-gray-900">{style.name}</h5>
-                      <p className="text-sm text-gray-600 mb-2">{style.description}</p>
+                      <h5 className="font-medium text-white">{style.name}</h5>
+                      <p className="text-sm text-gray-400 mb-2">{style.description}</p>
                       <div className="flex flex-wrap gap-2 mb-2">
                         {style.characteristics?.map((char: string, i: number) => (
-                          <span key={i} className="bg-gray-100 text-gray-700 px-2 py-1 text-xs rounded">
+                          <span key={i} className="bg-slate-600/50 text-gray-300 px-2 py-1 text-xs rounded">
                             {char}
                           </span>
                         ))}
                       </div>
-                      <p className="text-sm text-blue-700">
+                      <p className="text-sm text-blue-300">
                         <strong>Best for:</strong> {style.suitableFor}
                       </p>
                     </div>
@@ -270,15 +270,15 @@ const UIDesignSection: React.FC<UIDesignSectionProps> = ({
 
           {/* Inspiration Sources */}
           <div>
-            <h4 className="text-lg font-medium text-gray-900 mb-4">Design Inspiration</h4>
+            <h4 className="text-lg font-medium text-white mb-4">Design Inspiration</h4>
             <div className="grid gap-4">
               {designSuggestions.inspirationSources?.map((source: any, index: number) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                  <h5 className="font-medium text-gray-900 mb-2">{source.name}</h5>
-                  <p className="text-sm text-gray-600 mb-2">{source.reason}</p>
+                <div key={index} className="border border-slate-600 rounded-lg p-4 bg-slate-700/20">
+                  <h5 className="font-medium text-white mb-2">{source.name}</h5>
+                  <p className="text-sm text-gray-400 mb-2">{source.reason}</p>
                   <div className="flex flex-wrap gap-2">
                     {source.elements?.map((element: string, i: number) => (
-                      <span key={i} className="bg-green-100 text-green-800 px-2 py-1 text-xs rounded">
+                      <span key={i} className="bg-green-500/20 text-green-300 px-2 py-1 text-xs rounded">
                         {element}
                       </span>
                     ))}

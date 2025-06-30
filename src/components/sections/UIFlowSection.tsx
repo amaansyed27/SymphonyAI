@@ -101,11 +101,11 @@ const UIFlowSection: React.FC<UIFlowSectionProps> = ({
     <div className="space-y-6">
       {/* Controls */}
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900">User Flow Designer</h3>
+        <h3 className="text-lg font-semibold text-white">User Flow Designer</h3>
         <div className="flex space-x-2">
           <button
             onClick={addNode}
-            className="flex items-center px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            className="flex items-center px-3 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition-colors"
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Node
@@ -126,8 +126,8 @@ const UIFlowSection: React.FC<UIFlowSectionProps> = ({
       </div>
 
       {!apiKey && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-          <p className="text-amber-800 text-sm">
+        <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
+          <p className="text-amber-200 text-sm">
             Please add your Gemini API key to generate AI-powered user flows.
           </p>
         </div>
@@ -136,11 +136,11 @@ const UIFlowSection: React.FC<UIFlowSectionProps> = ({
       <div className="flex space-x-6">
         {/* Flow Canvas */}
         <div className="flex-1">
-          <div className="bg-gray-50 rounded-lg border border-gray-200 relative overflow-hidden" style={{ height: '500px' }}>
+          <div className="bg-slate-700/30 rounded-lg border border-slate-600 relative overflow-hidden" style={{ height: '500px' }}>
             {flow.length === 0 ? (
-              <div className="flex items-center justify-center h-full text-gray-500">
+              <div className="flex items-center justify-center h-full text-gray-400">
                 <div className="text-center">
-                  <GitBranch className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                  <GitBranch className="h-12 w-12 mx-auto mb-4 text-gray-500" />
                   <p>No flow created yet. Generate one with AI or add nodes manually.</p>
                 </div>
               </div>
@@ -160,7 +160,7 @@ const UIFlowSection: React.FC<UIFlowSectionProps> = ({
                           y1={node.position.y + 20}
                           x2={targetNode.position.x + 40}
                           y2={targetNode.position.y + 20}
-                          stroke="#6B7280"
+                          stroke="#64748B"
                           strokeWidth="2"
                           markerEnd="url(#arrowhead)"
                         />
@@ -170,7 +170,7 @@ const UIFlowSection: React.FC<UIFlowSectionProps> = ({
                   <defs>
                     <marker id="arrowhead" markerWidth="10" markerHeight="7" 
                             refX="9" refY="3.5" orient="auto">
-                      <polygon points="0 0, 10 3.5, 0 7" fill="#6B7280" />
+                      <polygon points="0 0, 10 3.5, 0 7" fill="#64748B" />
                     </marker>
                   </defs>
                 </svg>
@@ -180,7 +180,7 @@ const UIFlowSection: React.FC<UIFlowSectionProps> = ({
                   <div
                     key={node.id}
                     className={`absolute cursor-pointer transition-transform hover:scale-105 ${
-                      selectedNode?.id === node.id ? 'ring-2 ring-blue-500' : ''
+                      selectedNode?.id === node.id ? 'ring-2 ring-blue-400' : ''
                     }`}
                     style={{
                       left: `${node.position.x}px`,
@@ -192,7 +192,7 @@ const UIFlowSection: React.FC<UIFlowSectionProps> = ({
                     <div className={`px-4 py-2 rounded-lg text-white text-sm font-medium shadow-lg border-2 ${getNodeColor(node.type)}`}>
                       {node.name}
                     </div>
-                    <div className="text-xs text-gray-600 text-center mt-1 capitalize">
+                    <div className="text-xs text-gray-400 text-center mt-1 capitalize">
                       {node.type}
                     </div>
                   </div>
@@ -205,27 +205,27 @@ const UIFlowSection: React.FC<UIFlowSectionProps> = ({
           <div className="mt-4 flex items-center space-x-6 text-sm">
             <div className="flex items-center space-x-2">
               <div className="w-4 h-4 bg-blue-500 rounded"></div>
-              <span>Screen</span>
+              <span className="text-gray-300">Screen</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-4 h-4 bg-green-500 rounded"></div>
-              <span>Action</span>
+              <span className="text-gray-300">Action</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-4 h-4 bg-orange-500 rounded"></div>
-              <span>Decision</span>
+              <span className="text-gray-300">Decision</span>
             </div>
           </div>
         </div>
 
         {/* Node Editor */}
         {selectedNode && (
-          <div className="w-80 bg-white border border-gray-200 rounded-lg p-4">
+          <div className="w-80 bg-slate-700/30 border border-slate-600 rounded-lg p-4">
             <div className="flex items-center justify-between mb-4">
-              <h4 className="font-medium text-gray-900">Edit Node</h4>
+              <h4 className="font-medium text-white">Edit Node</h4>
               <button
                 onClick={() => deleteNode(selectedNode.id)}
-                className="p-1 text-red-600 hover:bg-red-100 rounded"
+                className="p-1 text-red-400 hover:bg-red-500/20 rounded"
               >
                 <Trash2 className="h-4 w-4" />
               </button>
@@ -233,21 +233,21 @@ const UIFlowSection: React.FC<UIFlowSectionProps> = ({
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Name</label>
                 <input
                   type="text"
                   value={selectedNode.name}
                   onChange={(e) => updateNode(selectedNode.id, { name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Type</label>
                 <select
                   value={selectedNode.type}
                   onChange={(e) => updateNode(selectedNode.id, { type: e.target.value as any })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
                 >
                   <option value="screen">Screen</option>
                   <option value="action">Action</option>
@@ -256,7 +256,7 @@ const UIFlowSection: React.FC<UIFlowSectionProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Position</label>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Position</label>
                 <div className="grid grid-cols-2 gap-2">
                   <input
                     type="number"
@@ -265,7 +265,7 @@ const UIFlowSection: React.FC<UIFlowSectionProps> = ({
                     onChange={(e) => updateNode(selectedNode.id, { 
                       position: { ...selectedNode.position, x: parseInt(e.target.value) || 0 }
                     })}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
                   />
                   <input
                     type="number"
@@ -274,13 +274,13 @@ const UIFlowSection: React.FC<UIFlowSectionProps> = ({
                     onChange={(e) => updateNode(selectedNode.id, { 
                       position: { ...selectedNode.position, y: parseInt(e.target.value) || 0 }
                     })}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Connections (Node IDs, comma-separated)
                 </label>
                 <input
@@ -290,7 +290,7 @@ const UIFlowSection: React.FC<UIFlowSectionProps> = ({
                     connections: e.target.value.split(',').map(s => s.trim()).filter(Boolean)
                   })}
                   placeholder="node-1, node-2"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-gray-400"
                 />
               </div>
             </div>

@@ -114,20 +114,20 @@ const BuilderToolsSection: React.FC<BuilderToolsSectionProps> = ({
 
   const getCategoryColor = (color: string) => {
     const colors = {
-      blue: 'bg-blue-50 border-blue-200',
-      green: 'bg-green-50 border-green-200',
-      orange: 'bg-orange-50 border-orange-200',
-      purple: 'bg-purple-50 border-purple-200'
+      blue: 'bg-blue-500/10 border-blue-500/20',
+      green: 'bg-green-500/10 border-green-500/20',
+      orange: 'bg-orange-500/10 border-orange-500/20',
+      purple: 'bg-purple-500/10 border-purple-500/20'
     };
     return colors[color as keyof typeof colors] || colors.blue;
   };
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'Easy': return 'bg-green-100 text-green-800';
-      case 'Medium': return 'bg-yellow-100 text-yellow-800';
-      case 'Hard': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'Easy': return 'bg-green-500/20 text-green-300';
+      case 'Medium': return 'bg-yellow-500/20 text-yellow-300';
+      case 'Hard': return 'bg-red-500/20 text-red-300';
+      default: return 'bg-gray-500/20 text-gray-300';
     }
   };
 
@@ -135,7 +135,7 @@ const BuilderToolsSection: React.FC<BuilderToolsSectionProps> = ({
     <div className="space-y-8">
       {/* Generate Button */}
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900">Development Tool Recommendations</h3>
+        <h3 className="text-lg font-semibold text-white">Development Tool Recommendations</h3>
         <button
           onClick={generateRecommendations}
           disabled={isLoading || !apiKey}
@@ -151,8 +151,8 @@ const BuilderToolsSection: React.FC<BuilderToolsSectionProps> = ({
       </div>
 
       {!apiKey && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-          <p className="text-amber-800 text-sm">
+        <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
+          <p className="text-amber-200 text-sm">
             Please add your Gemini API key to get tool recommendations and custom prompts.
           </p>
         </div>
@@ -167,8 +167,8 @@ const BuilderToolsSection: React.FC<BuilderToolsSectionProps> = ({
 
             return (
               <div key={category.key}>
-                <h4 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                  <category.icon className={`h-5 w-5 text-${category.color}-600 mr-2`} />
+                <h4 className="text-lg font-medium text-white mb-4 flex items-center">
+                  <category.icon className={`h-5 w-5 text-${category.color}-400 mr-2`} />
                   {category.title}
                 </h4>
                 <div className="grid gap-4">
@@ -177,23 +177,23 @@ const BuilderToolsSection: React.FC<BuilderToolsSectionProps> = ({
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
                           <div className="flex items-center space-x-3 mb-2">
-                            <h5 className="text-lg font-semibold text-gray-900">{tool.name}</h5>
-                            <span className="bg-gray-100 text-gray-700 px-2 py-1 text-xs rounded">
+                            <h5 className="text-lg font-semibold text-white">{tool.name}</h5>
+                            <span className="bg-slate-600/50 text-gray-300 px-2 py-1 text-xs rounded">
                               {tool.pricing}
                             </span>
                             <span className={`px-2 py-1 text-xs rounded ${getDifficultyColor(tool.learningCurve)}`}>
                               {tool.learningCurve}
                             </span>
                           </div>
-                          <p className="text-gray-600 mb-3">{tool.description}</p>
+                          <p className="text-gray-300 mb-3">{tool.description}</p>
                           <div className="flex flex-wrap gap-2 mb-3">
                             {tool.features?.map((feature: string, i: number) => (
-                              <span key={i} className="bg-white text-gray-700 px-2 py-1 text-xs rounded border">
+                              <span key={i} className="bg-slate-600/30 text-gray-300 px-2 py-1 text-xs rounded border border-slate-600">
                                 {feature}
                               </span>
                             ))}
                           </div>
-                          <p className="text-sm text-blue-700">
+                          <p className="text-sm text-blue-300">
                             <strong>Best for:</strong> {tool.bestFor}
                           </p>
                         </div>
@@ -203,7 +203,7 @@ const BuilderToolsSection: React.FC<BuilderToolsSectionProps> = ({
                               href={tool.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="p-2 text-gray-600 hover:text-blue-600 transition-colors"
+                              className="p-2 text-gray-400 hover:text-blue-400 transition-colors"
                             >
                               <ExternalLink className="h-4 w-4" />
                             </a>
@@ -227,33 +227,33 @@ const BuilderToolsSection: React.FC<BuilderToolsSectionProps> = ({
 
       {/* Generated Prompts */}
       {selectedTool && generatedPrompts && (
-        <div className="bg-gray-50 rounded-xl p-6">
-          <h4 className="text-lg font-semibold text-gray-900 mb-4">
+        <div className="bg-slate-700/20 rounded-xl p-6 border border-slate-600">
+          <h4 className="text-lg font-semibold text-white mb-4">
             Custom Prompts for {selectedTool.name}
           </h4>
           <div className="space-y-4">
             {generatedPrompts.prompts?.map((prompt: any, index: number) => (
-              <div key={index} className="bg-white rounded-lg p-4 border border-gray-200">
+              <div key={index} className="bg-slate-700/30 rounded-lg p-4 border border-slate-600">
                 <div className="flex items-center justify-between mb-3">
-                  <h5 className="font-medium text-gray-900">
+                  <h5 className="font-medium text-white">
                     Step {prompt.order}: {prompt.title}
                   </h5>
                   <button
                     onClick={() => copyToClipboard(prompt.content)}
-                    className="flex items-center px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+                    className="flex items-center px-3 py-1 text-sm bg-slate-600 hover:bg-slate-500 rounded transition-colors text-gray-300"
                   >
                     <Copy className="h-4 w-4 mr-1" />
                     Copy
                   </button>
                 </div>
-                <div className="bg-gray-50 rounded p-3 text-sm text-gray-700 font-mono whitespace-pre-wrap">
+                <div className="bg-slate-800/50 rounded p-3 text-sm text-gray-300 font-mono whitespace-pre-wrap">
                   {prompt.content}
                 </div>
               </div>
             ))}
           </div>
-          <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <p className="text-sm text-blue-800">
+          <div className="mt-4 p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
+            <p className="text-sm text-blue-200">
               <strong>Tip:</strong> Use these prompts in sequence with {selectedTool.name}. 
               Each prompt builds on the previous one to create your complete project.
             </p>
