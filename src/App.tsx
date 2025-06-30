@@ -230,7 +230,7 @@ function App() {
               <ArrowLeft className="h-5 w-5 mr-2" />
               Back to Home
             </button>
-            <Logo size={32} showText />
+            <Logo size={48} showText />
           </div>
         </header>
         
@@ -261,17 +261,19 @@ function App() {
               
               <div className="flex items-center space-x-3">
                 {projectData.logo ? (
-                  <img src={projectData.logo} alt="Project logo" className="h-8 w-8 object-contain" />
+                  <img src={projectData.logo} alt="Project logo" className="h-10 w-10 object-contain" />
                 ) : (
-                  <Logo size={32} />
+                  <Logo size={40} />
                 )}
                 <div>
                   <h1 className="text-xl font-bold text-gray-900">
                     {projectData.name || 'Symphony'}
                   </h1>
-                  <p className="text-sm text-gray-600">
-                    {projectData.slogan || 'AI Project Planner'}
-                  </p>
+                  {projectData.slogan && (
+                    <p className="text-sm text-gray-600">
+                      {projectData.slogan}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

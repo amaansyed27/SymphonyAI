@@ -4,9 +4,26 @@ interface LogoProps {
   size?: number;
   className?: string;
   showText?: boolean;
+  textSize?: 'sm' | 'md' | 'lg';
 }
 
-const Logo: React.FC<LogoProps> = ({ size = 32, className = '', showText = false }) => {
+const Logo: React.FC<LogoProps> = ({ 
+  size = 32, 
+  className = '', 
+  showText = false, 
+  textSize = 'md' 
+}) => {
+  const getTextClasses = () => {
+    switch (textSize) {
+      case 'sm':
+        return 'text-lg font-bold text-gray-900';
+      case 'lg':
+        return 'text-3xl font-bold text-white';
+      default:
+        return 'text-xl font-bold text-gray-900';
+    }
+  };
+
   return (
     <div className={`flex items-center space-x-3 ${className}`}>
       <svg 
@@ -59,8 +76,7 @@ const Logo: React.FC<LogoProps> = ({ size = 32, className = '', showText = false
       
       {showText && (
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Symphony</h1>
-          <p className="text-sm text-gray-600">AI Project Planner</p>
+          <h1 className={getTextClasses()}>Symphony</h1>
         </div>
       )}
     </div>
