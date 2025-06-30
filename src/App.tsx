@@ -78,7 +78,6 @@ function App() {
   const [apiKey, setApiKey] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationProgress, setGenerationProgress] = useState('');
-  const [stageCompletions, setStageCompletions] = useState<Record<string, boolean>>({});
 
   const { generateStructuredContent, generateLogo } = useGemini();
 
@@ -421,15 +420,22 @@ function App() {
     const completeProjectData = await generateAllContent(newProjectData);
     setProjectData(completeProjectData);
     
-    // Update stage availability
+    // Update stage availability and completion
     updateStageAvailability(completeProjectData);
   };
 
   const updateStageAvailability = (data: Partial<ProjectData>) => {
     const updatedStages = roadmapStages.map((stage, index) => {
+      // Check if this stage is completed
+      const isCompleted = checkStageCompletion(stage.id, data);
+      
+      if (isCompleted) {
+        return { ...stage, status: 'completed' as const };
+      }
+      
       // First stage is always available
       if (index === 0) {
-        return { ...stage, status: 'available' };
+        return { ...stage, status: 'available' as const };
       }
       
       // Check if previous stages are completed
@@ -438,10 +444,10 @@ function App() {
       });
       
       if (previousStagesCompleted) {
-        return { ...stage, status: 'available' };
+        return { ...stage, status: 'available' as const };
       }
       
-      return stage;
+      return { ...stage, status: 'locked' as const };
     });
     
     setRoadmapStages(updatedStages);
@@ -469,8 +475,6 @@ function App() {
   };
 
   const markStageAsCompleted = (stageId: string) => {
-    setStageCompletions(prev => ({ ...prev, [stageId]: true }));
-    
     // Update the roadmap stages to show completion
     const updatedStages = roadmapStages.map(stage =>
       stage.id === stageId
@@ -491,12 +495,9 @@ function App() {
   const handleProjectUpdate = (updates: Partial<ProjectData>) => {
     const updatedData = { ...projectData, ...updates };
     setProjectData(updatedData);
-    updateStageAvailability(updatedData);
     
-    // Mark current stage as completed if it meets requirements
-    if (selectedStage && checkStageCompletion(selectedStage.id, updatedData)) {
-      markStageAsCompleted(selectedStage.id);
-    }
+    // Update stage availability and completion status
+    updateStageAvailability(updatedData);
   };
 
   const handleSaveApiKey = (key: string) => {
@@ -506,7 +507,7 @@ function App() {
 
   // Check if all stages are completed
   const allStagesCompleted = roadmapStages.every(stage => 
-    stage.status === 'completed' || checkStageCompletion(stage.id, projectData)
+    stage.status === 'completed'
   );
 
   if (currentStep === 'questionnaire') {
